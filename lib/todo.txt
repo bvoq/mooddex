@@ -1,0 +1,2 @@
+Choose color of bar from image using https://stackoverflow.com/questions/50449610/pick-main-color-from-picture/54607434
+
