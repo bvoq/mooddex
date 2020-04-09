@@ -9,11 +9,13 @@
 // I get my work done better remotely and here's why.
 // Could we negotiate in the future about working remotely.
 
+// For adding Google OAuth: https://developers.google.com/identity/sign-in/ios/start-integrating?authuser=2
+
 //import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
-import 'moodSearch.dart';
+import 'splashPage.dart';
 
 void main() => runApp(MyApp());
 
@@ -21,13 +23,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     //final wordPair = WordPair.random();
+
     return MaterialApp(
       title: 'Mooddex',
       //home: RandomWords(),
       initialRoute: '/',
       routes: <String, WidgetBuilder>{
         '/': (BuildContext context) {
-          return MoodHome();
+          return SplashPage();
         },
       },
       /*
@@ -47,59 +50,6 @@ class MyApp extends StatelessWidget {
           accentColor: Colors.deepOrange),
       */
       debugShowCheckedModeBanner: true,
-    );
-  }
-}
-
-class MoodHome extends StatefulWidget {
-  @override
-  MoodState createState() => MoodState();
-}
-
-class MoodState extends State<MoodHome> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      /*
-      appBar: AppBar(
-        title: Text('Search demo'),
-      ),*/
-      body: Center(
-        child: Builder(
-          builder: (context) => MaterialButton(
-            //MaterialButton
-            child: Text('Search'),
-            /*
-            onPressed: () => Navigator.push(
-                context,
-                CupertinoPageRoute(
-                    builder: (context) => MoodSearchCupertino())),
-            */
-
-            onPressed: () => showSearch(
-              context: context,
-              delegate: MoodSearchMaterial(),
-            ),
-          ),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.search),
-        onPressed: () => showSearch(
-          context: context,
-          delegate: MoodSearchMaterial(),
-        ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        //color: Colors.orange,
-        items: [
-          BottomNavigationBarItem(
-              icon: Icon(Icons.art_track), title: Text('My Moods')),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.supervisor_account), title: Text('Friends')),
-        ],
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }

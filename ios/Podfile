@@ -88,3 +88,7 @@ post_install do |installer|
     end
   end
 end
+
+
+# Google sign-in
+# pod 'GoogleSignIn'

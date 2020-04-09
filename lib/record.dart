@@ -1,9 +1,17 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:path/path.dart';
 
+import 'package:http/http.dart' show get;
+import 'package:path_provider/path_provider.dart';
+
+import 'package:firebase_auth/firebase_auth.dart';
+
+import 'globalState.dart';
 import 'stopwords.dart';
 
 class IDPair {
@@ -16,10 +24,14 @@ class IDPair {
 
 class Record {
   final String name;
-  final int added;
-  final List<int> votes;
-  final int totalvotes;
-  File imageFile;
+  final String searchName;
+
+  List<int> votes;
+  int totalvotes;
+  int added;
+  File imageFileToBeUploaded; //used when uploading a record
+  String imageURL;
+  String image;
   double unweightedScore;
   double score;
   bool uploaded;
@@ -42,57 +54,146 @@ class Record {
 
   Record.fromMap(Map<String, dynamic> map, {this.reference})
       : assert(map['name'] != null),
-        assert(map['votes'] != null),
-        assert(map['added'] != null),
-        assert(map['votes'].length == 10),
+        assert(map['votes_0'] != null),
+        assert(map['votes_1'] != null),
+        assert(map['votes_2'] != null),
+        assert(map['votes_3'] != null),
+        assert(map['votes_4'] != null),
+        assert(map['votes_5'] != null),
+        assert(map['votes_6'] != null),
+        assert(map['votes_7'] != null),
+        assert(map['votes_8'] != null),
+        assert(map['votes_9'] != null),
+        assert(map['votes_10'] != null),
         assert(map['search_terms'] != null),
+        assert(map['image_ref'] != null),
         name = map['name'],
+        searchName = map['name']
+            .toString()
+            .toLowerCase()
+            .toUpperCase()
+            .toLowerCase()
+            .replaceAll(" ", "_"),
         added = map['added'],
-        votes = map['votes'].cast<int>(),
+        //votes = map['votes'].cast<int>(),
+        votes = [
+          map['votes_0'],
+          map['votes_1'],
+          map['votes_2'],
+          map['votes_3'],
+          map['votes_4'],
+          map['votes_5'],
+          map['votes_6'],
+          map['votes_7'],
+          map['votes_8'],
+          map['votes_9'],
+          map['votes_10']
+        ],
         //votes = map['votes'].map((s) => s as int).toList(),
-        totalvotes = map['votes'].reduce((a, b) => a + b),
         uploaded = true,
-        imageFile = null,
-        unweightedScore = map['votes']
-            .fold(
-                IDPair(1, 0),
-                (p, val) => IDPair(p.a + 1,
-                    p.b + p.a * val / map['votes'].reduce((a, b) => a + b)))
-            .b;
+        imageURL = map['image_ref'],
+        imageFileToBeUploaded = null,
+        image = null {
+    updateScore(votes);
+  }
 
   Record.fromSnapshot(DocumentSnapshot snapshot)
       : this.fromMap(snapshot.data, reference: snapshot.reference);
 
   Record.fromInitializer(
-      String name, int added, List<int> votes, int totalvotes)
+      String name, List<int> votes, File imageFileToBeUploaded)
       : assert(votes.length == 10),
         assert(name.length > 3 && name.length <= 45),
         name = name,
-        added = added,
+        searchName = name
+            .toString()
+            .toLowerCase()
+            .toUpperCase()
+            .toLowerCase()
+            .replaceAll(" ", "_"),
         votes = votes,
-        totalvotes = totalvotes,
-        uploaded = false;
-/* TODO
-  Future<String> uploadImage(var imageFile) async {
-    String searchName =
-        name.toString().toLowerCase().toUpperCase().toLowerCase();
-    StorageReference ref = storage.ref().child("images/" + searchName + ".jpg");
-    StorageUploadTask uploadTask = ref.putFile(imageFile);
+        imageFileToBeUploaded = imageFileToBeUploaded,
+        uploaded = false,
+        image = null,
+        reference = null {
+    updateScore(votes);
+    imageURL = "";
+  }
 
-    var dowurl = await (await uploadTask.onComplete).ref.getDownloadURL();
-    url = dowurl.toString();
+  void updateScore(List<int> _votes) {
+    votes = _votes;
+    added = votes.reduce((a, b) => a + b);
+    totalvotes = votes.reduce((a, b) => a + b) - votes[0];
+    unweightedScore = votes
+        .fold(IDPair(0, 0),
+            (p, val) => IDPair(p.a + 1, p.b + p.a * val / totalvotes))
+        .b;
+  }
 
-    return url;
-  }*/
+  //Image.file(File(image), width: 600.0, height: 290.0);
+  Future<bool> loadImageFromFirebase() async {
+    debugPrint("calling loadimage");
+    //comment out the next two lines to 'prove' the next time that you run
+    //the code to prove that it was downloaded and saved to your device
+    if (image == null) {
+      //var url =
+      //    "https://firebasestorage.googleapis.com/v0/b/mooddex-b9ca6.appspot.com/o/images%2Fchiropractic_bone_cracking.jpg?alt=media&token=80c3ade8-e074-418e-a769-d2bf19b4b244";
+
+      Directory documentDirectory = await getApplicationDocumentsDirectory();
+      String firstPath = documentDirectory.path + "/images";
+      String filePathAndName =
+          documentDirectory.path + '/images/' + searchName + '.jpg';
+
+      //comment out the next three lines to 'prove' the next time that you run
+      // the code to prove that it was downloaded and saved to your device
+      await Directory(firstPath).create(recursive: true);
+      File file2 = new File(filePathAndName);
+      if (!(await file2.exists())) {
+        var response = await get(imageURL);
+        debugPrint(
+            "loaded image with status code " + response.statusCode.toString());
+        if (response.statusCode >= 200 && response.statusCode <= 299) {
+          file2.writeAsBytesSync(response.bodyBytes);
+        } else {
+          return false;
+        }
+      }
+      image = filePathAndName;
+      return true;
+    }
+    return false;
+  }
+
+  Future<void> _uploadImage() async {
+    String extension =
+        basename(imageFileToBeUploaded.path).split('.').last.toLowerCase();
+
+    debugPrint('the base name is: ' + extension);
+
+    if (extension != "jpg" && extension != "jpeg" && extension != "png") {
+      debugPrint('unknown basename: ' + extension);
+      return "";
+    }
+
+    FirebaseStorage storage = FirebaseStorage.instance;
+
+    StorageReference ref =
+        storage.ref().child("images").child(searchName + "." + extension);
+    StorageUploadTask uploadTask = ref.putFile(imageFileToBeUploaded);
+
+    String dowurl = await (await uploadTask.onComplete).ref.getDownloadURL();
+    imageURL = dowurl;
+  }
 
   Future<void> publish() async {
-    if (uploaded == true)
+    if (uploaded == true) return;
+
+    FirebaseUser user = globalState.getUser();
+    if (user == null)
       return;
     else {
-      String searchName =
-          name.toString().toLowerCase().toUpperCase().toLowerCase();
       List<String> searchWords = searchName
-          .split(" ")
+          .split("_")
           .where((i) => (i.length > 2 && !stopwords.contains(i)))
           .toList();
       List<String> searchTerms = [];
@@ -102,33 +203,42 @@ class Record {
         }
       }
 
-      DocumentSnapshot ds = await Firestore.instance
-          .collection('moods')
-          .document(searchName)
-          .get()
-          .catchError((onError) {
+      DocumentReference _reference =
+          Firestore.instance.collection('moods').document(searchName);
+      reference = _reference;
+
+      DocumentSnapshot ds = await _reference.get().catchError((onError) {
         debugPrint('Seems to be offline.');
         return;
       });
       if (ds.exists) {
-        reference = ds.reference;
         uploaded = true;
         return;
       } else {
         //first upload the image, then upload the firestore instance.
-
-        await Firestore.instance
-            .collection('moods')
-            .document(searchName)
-            .setData({
-          'name': name,
-          'search_terms': searchTerms,
-          'votes': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-          'added': 1,
-        }).then((onValue) {
-          uploaded = true;
-        }).catchError((onError) {});
-        return;
+        await _uploadImage().then((onValue) async {
+          if (imageURL.length > 0) {
+            await _reference.setData({
+              'name': name,
+              'search_terms': searchTerms,
+              'votes_0': 0,
+              'votes_1': 0,
+              'votes_2': 0,
+              'votes_3': 0,
+              'votes_4': 0,
+              'votes_5': 0,
+              'votes_6': 0,
+              'votes_7': 0,
+              'votes_8': 0,
+              'votes_9': 0,
+              'votes_10': 0,
+              'image_ref': imageURL,
+              'author': user.uid,
+            }).then((onValue) {
+              uploaded = true;
+            }).catchError((onError) {});
+          }
+        });
       }
     }
   }

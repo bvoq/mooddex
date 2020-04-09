@@ -101,7 +101,7 @@ Widget _searchSuggestions(String query) {
 Widget _buildListItem(
     BuildContext context, DocumentSnapshot data, String query) {
   //final record = Record.fromMap(data); // where Map data
-  final record = Record.fromSnapshot(data);
+  Record record = Record.fromSnapshot(data);
   return Padding(
     key: ValueKey(record.name),
     padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -111,16 +111,26 @@ Widget _buildListItem(
         borderRadius: BorderRadius.circular(5.0),
       ),
       child: ListTile(
-        title: Text(record.name),
-        trailing:
-            Text(record.added.toString()), //Text(record.votes.toString()),
-        onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => MoodDetail(record: record),
-            )),
-        // Navigator.of(context).push(record.findValue), //print(record),
-      ),
+          title: Text(record.name),
+          trailing: Container(
+            width: 40,
+            child: Row(
+              children: [
+                Icon(Icons.people),
+                Text(record.totalvotes.toString()),
+              ],
+            ),
+          ),
+          onTap: () async {
+            //record.loadImageFromFirebase().then((void v) =>
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MoodDetail(initialRecord: record),
+                ));
+          }
+          // Navigator.of(context).push(record.findValue), //print(record),
+          ),
     ),
   );
 }

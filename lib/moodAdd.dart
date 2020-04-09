@@ -13,42 +13,67 @@ class MoodAdd extends StatefulWidget {
   final String query;
   const MoodAdd({Key key, @required this.query}) : super(key: key);
   @override
-  State<StatefulWidget> createState() => MoodAddState();
+  State<StatefulWidget> createState() => MoodAddState(this.query);
 }
 
 class MoodAddState extends State<MoodAdd> {
+  final GlobalKey<FormState> _loginFormKey = GlobalKey<FormState>();
+
   TextEditingController _nameController;
   ImageChooser _imageChooser;
+  File _imageFile;
+  bool triedSubmittingButFailed = false;
+
+  MoodAddState(String queryName) {
+    _nameController = TextEditingController(text: queryName);
+    _imageFile = null;
+  }
+
   //Record record;
   //Color color = Color.fromRGBO(0, 0, 255, 0.4);
 
-  void publishWidgetAndUpdateScreen(BuildContext context) {
-    debugPrint('Publishing the mood ' + _nameController.text);
-    Record r = Record.fromInitializer(
-        _nameController.text, 1, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 0);
-    Future<void> success = r.publish();
+  String _nameValidator(String value) {
+    if (value.length <= 4) {
+      return 'Name must be longer than 4 characters';
+    }
+    return null;
+  }
 
-    success.then((value) {
-      if (r.uploaded) {
-        Navigator.pop(context);
-        //only switch if you successfully added the mood!
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => MoodDetail(record: r),
-            ));
-      } else {}
-    });
-    //add zero ratings
+  void publishWidgetAndUpdateScreen(BuildContext context) {
+    if (_imageFile != null) {
+      debugPrint('Publishing the mood ' + _nameController.text);
+      Record r = Record.fromInitializer(
+          _nameController.text, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _imageFile);
+      Future<void> success = r.publish();
+
+      success.then((value) {
+        if (r.uploaded) {
+          //r.loadImageFromFirebase().then((void v) {
+          Navigator.pop(context);
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MoodDetail(initialRecord: r),
+              ));
+        } else {}
+      });
+      //add zero ratings
+    } else {
+      // just ignore the request, no image selected yet..
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('Previous string: ' + widget.query);
-    //record = Record();
-    //record.name = widget.query;
-    _nameController = TextEditingController(text: widget.query);
-    _imageChooser = ImageChooser();
+    debugPrint('Previous tt: ' + triedSubmittingButFailed.toString());
+
+    _imageChooser = ImageChooser(
+      errorColor: triedSubmittingButFailed ? Colors.red : Colors.black,
+      onImageSelect: (File returnedImageFile) {
+        _imageFile = returnedImageFile;
+      },
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Add Mood'),
@@ -56,48 +81,57 @@ class MoodAddState extends State<MoodAdd> {
           IconButton(
               icon: Icon(Icons.queue),
               onPressed: () {
-                publishWidgetAndUpdateScreen(context);
+                if (_loginFormKey.currentState.validate()) {
+                  publishWidgetAndUpdateScreen(context);
+                }
+                triedSubmittingButFailed = true;
+                setState(() => {});
               }),
         ],
       ),
-      body: Column(
-        children: [
-          _imageChooser,
-          Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-          ),
-          Text('Mood name:'),
-          TextField(
-            controller: _nameController,
-            decoration: InputDecoration(
-                // border: InputBorder.none,
-                border: InputBorder.none,
-                focusedBorder: InputBorder.none,
-                contentPadding:
-                    EdgeInsets.only(left: 15, bottom: 11, top: 11, right: 15),
-                hintText: 'Mood name'),
-            maxLength: 45,
-            /*alternative: inputFormatters: [
-              LengthLimitingTextInputFormatter(30),
-            ],*/
-          ),
-          Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-          ),
-          Text('Similarly named moods'),
-        ],
+      body: Form(
+        key: _loginFormKey,
+        child: Column(
+          children: [
+            _imageChooser,
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            ),
+            Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                child: TextFormField(
+                  autocorrect: false,
+                  decoration: InputDecoration(
+                      labelText: 'Mood name*', hintText: 'Mood name'),
+                  controller: _nameController,
+                  obscureText: false,
+                  maxLength: 45,
+                  validator: _nameValidator,
+                )),
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            ),
+            Text('Similarly named moods'),
+          ],
+        ),
       ),
     );
   }
 }
 
+typedef ImageCallback = void Function(File imageFile);
+
 class ImageChooser extends StatefulWidget {
-  ImageChooser({Key key, this.title}) : super(key: key);
+  ImageChooser({Key key, this.onImageSelect, this.errorColor})
+      : super(key: key);
 
-  final String title;
+  final ImageCallback onImageSelect;
+  final Color errorColor;
 
+  //ImageChooserState imageChooserState;
   @override
   ImageChooserState createState() => ImageChooserState();
 }
@@ -113,20 +147,26 @@ class ImageChooserState extends State<ImageChooser> {
   final TextEditingController maxHeightController = TextEditingController();
   final TextEditingController qualityController = TextEditingController();
 
+  File getImageFile() {
+    return _imageFile; //returns null if not yet chosen!
+  }
+
   void _onImageButtonPressed(ImageSource source, {BuildContext context}) async {
-    await _displayPickImageDialog(context,
-        (double maxWidth, double maxHeight, int quality) async {
-      try {
-        _imageFile = await ImagePicker.pickImage(
-            source: source,
-            maxWidth: maxWidth,
-            maxHeight: maxHeight,
-            imageQuality: quality);
-        setState(() {});
-      } catch (e) {
-        _pickImageError = e;
-      }
-    });
+    double maxWidth = 1366; // null
+    double maxHeight = 480;
+    int quality = 80; //null;
+
+    try {
+      _imageFile = await ImagePicker.pickImage(
+          source: source,
+          maxWidth: maxWidth,
+          maxHeight: maxHeight,
+          imageQuality: quality);
+      widget.onImageSelect(_imageFile);
+      setState(() {});
+    } catch (e) {
+      _pickImageError = e;
+    }
   }
 
   @override
@@ -148,11 +188,13 @@ class ImageChooserState extends State<ImageChooser> {
       return Text(
         'Pick image error: $_pickImageError',
         textAlign: TextAlign.center,
+        style: TextStyle(color: Colors.red),
       );
     } else {
-      return const Text(
+      return Text(
         'You have not yet picked an image.',
         textAlign: TextAlign.center,
+        style: TextStyle(color: widget.errorColor),
       );
     }
   }
@@ -192,9 +234,10 @@ class ImageChooserState extends State<ImageChooser> {
                   switch (snapshot.connectionState) {
                     case ConnectionState.none:
                     case ConnectionState.waiting:
-                      return const Text(
+                      return Text(
                         'You have not yet picked an image.',
                         textAlign: TextAlign.center,
+                        style: TextStyle(color: widget.errorColor),
                       );
                     case ConnectionState.done:
                       return _previewImage();
@@ -205,9 +248,10 @@ class ImageChooserState extends State<ImageChooser> {
                           textAlign: TextAlign.center,
                         );
                       } else {
-                        return const Text(
+                        return Text(
                           'You have not yet picked an image.',
                           textAlign: TextAlign.center,
+                          style: TextStyle(color: widget.errorColor),
                         );
                       }
                   }
