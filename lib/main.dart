@@ -15,6 +15,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
+import 'login.dart';
 import 'splashPage.dart';
 
 void main() => runApp(MyApp());
@@ -46,6 +47,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
           primaryColor: Colors.deepOrangeAccent,
           brightness: Brightness.light,
+          backgroundColor: Colors.orange[100],
           //primaryColor: Color(0x003c7e00),
           accentColor: Colors.deepOrange),
       */

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -102,10 +103,36 @@ class MoodTitle extends SliverPersistentHeaderDelegate {
           ),
           /*3 all part of the same row, sample icon */
           Icon(
-            Icons.star,
-            color: Colors.red,
+            Icons.people,
+            color: Theme.of(context).accentColor,
           ),
-          Text(record.unweightedScore.toStringAsFixed(1)),
+          Text(" " + record.added.toString(),
+              style: TextStyle(color: Theme.of(context).accentColor)),
+          Padding(padding: EdgeInsets.only(right: 10)),
+          Icon(
+            Icons.star,
+            color: Theme.of(context).accentColor,
+          ),
+          Text(record.unweightedScore.toStringAsFixed(1),
+              style: TextStyle(color: Theme.of(context).accentColor)),
+          /*
+          Column(children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.people,
+                  color: Theme.of(context).accentColor,
+                ),
+                Text(" " + record.added.toString()),
+                Icon(
+                  Icons.star,
+                  color: Theme.of(context).accentColor,
+                ),
+                Text(record.unweightedScore.toStringAsFixed(1)),
+              ],
+            ),
+          ]),
+          */
         ],
       ),
     );
@@ -156,7 +183,7 @@ class MoodButtons extends SliverPersistentHeaderDelegate {
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
     return Container(
-      padding: const EdgeInsets.all(32),
+      padding: const EdgeInsets.only(top: 16, bottom: 40, left: 24, right: 24),
       decoration: new BoxDecoration(
         border: new Border.all(
             //width: W,
@@ -183,12 +210,16 @@ class MoodButtons extends SliverPersistentHeaderDelegate {
           _buildButtonColumn(
               Theme.of(context).accentColor,
               Icons.rate_review,
-              globalState.userRecords.containsKey(record.searchName)
+              globalState.userRecords.containsKey(record.searchName) &&
+                      globalState
+                              .userRecords[record.searchName].guideText.length >
+                          0
                   ? 'EDIT GUIDE'
                   : 'WRITE GUIDE', () {
             showDialog(
                 context: context,
-                builder: (BuildContext context) => MoodGuide(record: record));
+                builder: (BuildContext context) => MoodGuide(
+                    record: record, callbackMoodDetail: callbackMoodDetail));
           }),
           _buildButtonColumn(
               Theme.of(context).accentColor, Icons.share, 'SHARE', () {}),
@@ -201,10 +232,10 @@ class MoodButtons extends SliverPersistentHeaderDelegate {
   bool shouldRebuild(SliverPersistentHeaderDelegate _) => true;
 
   @override
-  double get maxExtent => 136.0;
+  double get maxExtent => 128.0;
 
   @override
-  double get minExtent => 136.0;
+  double get minExtent => 128.0;
 }
 
 class MoodGuides extends StatefulWidget {
@@ -219,6 +250,7 @@ class MoodGuidesState extends State<MoodGuides> {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint("loading streambuilder of guides");
     return StreamBuilder<QuerySnapshot>(
       stream: widget.initialRecord.reference
           .collection("guides")
@@ -226,46 +258,167 @@ class MoodGuidesState extends State<MoodGuides> {
           .limit(100)
           .snapshots(),
       builder: (context, snapshot) {
-        if (!snapshot.hasData) return LinearProgressIndicator();
-        return _buildGuides(context, snapshot.data.documents);
+        if (!snapshot.hasData)
+          return SliverToBoxAdapter(child: LinearProgressIndicator());
+
+        List<DocumentSnapshot> snaps = snapshot.data.documents;
+        List<Guide> guides = List<Guide>(snaps.length);
+        for (int i = 0; i < snaps.length; ++i) {
+          guides[i] = Guide.fromSnapshot(snaps[i]);
+        }
+        return SliverList(
+            delegate: SliverChildBuilderDelegate((content, i) {
+          return _buildItem(context, guides[i]);
+        }, childCount: guides.length));
       },
     );
   }
 
-  Widget _buildGuides(BuildContext context, List<DocumentSnapshot> snapshot) {
-    List<Widget> guideWidgets =
-        snapshot.map((data) => _buildGuideItem(context, data)).toList();
-
-    return ListView(
-      padding: const EdgeInsets.only(top: 20.0),
-      children: guideWidgets,
-    );
+  Color factorColor(Color a, Color b, double p) {
+    return Color.fromRGBO(
+        ((p * a.red + (1.0 - p) * b.red) / 1).round(),
+        ((p * a.green + (1.0 - p) * b.green) / 1).round(),
+        ((p * a.blue + (1.0 - p) * b.blue) / 1).round(),
+        (p * a.opacity + (1.0 - p) * b.opacity) / 1);
   }
 
-  Widget _buildGuideItem(BuildContext context, DocumentSnapshot snapshot) {
-    //final record = Record.fromMap(data); // where Map data
-    Guide guide = Guide.fromSnapshot(snapshot);
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: Container(
+  Widget _buildItem(BuildContext context, Guide guide) {
+    return ListTile(
+      title: Container(
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey),
-          borderRadius: BorderRadius.circular(5.0),
-        ),
-        child: ListTile(
-            title: Text(guide.guideText),
-            trailing: null,
-            onTap: () async {
+          border: Border(
               /*
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => MoodDetail(initialRecord: record),
-                  ));*/
-            }
-            // Navigator.of(context).push(record.findValue), //print(record),
-            ),
+            left: BorderSide(
+              color: Colors.transparent,
+              width: 15.0,
+            ),*/
+              /*
+            right: BorderSide(
+              color: Theme.of(context).accentColor,
+              width: 5.0,
+            ),*/
+              ),
+          color: factorColor(Theme.of(context).backgroundColor,
+              Theme.of(context).scaffoldBackgroundColor, 0.05),
+        ),
+        child: Padding(
+          padding: EdgeInsets.only(left: 10, right: 10, top: 15, bottom: 15),
+          child: Column(
+            children: [
+              Row(
+                  children: guide.rating == 0
+                      ? [
+                          Text("Unrated",
+                              style: TextStyle(
+                                color: Theme.of(context).accentColor,
+                                fontSize: 14,
+                              )),
+                        ]
+                      : [
+                          Text("Rated: ",
+                              style: TextStyle(
+                                color: Theme.of(context).accentColor,
+                                fontSize: 14,
+                              )),
+                          Icon(
+                            Icons.star,
+                            color: Theme.of(context).accentColor,
+                            size: 18,
+                          ),
+                          Text(
+                            guide.rating.toString(),
+                            style: TextStyle(
+                              color: Theme.of(context).accentColor,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ]),
+              Text(
+                guide.guideText,
+                textAlign: TextAlign.justify,
+                style: TextStyle(fontSize: 14),
+              ),
+              Row(
+                children: [
+                  Expanded(
+                      child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10))),
+                  Text("~ anonymous",
+                      style: TextStyle(color: Colors.blueGrey, fontSize: 14)),
+                  /*
+                      Padding(padding: EdgeInsets.symmetric(horizontal: 10)),
+                      Icon(Icons.star, color: Colors.blueGrey),
+                      Text(
+                        guide.rating.toString(),
+                        style: TextStyle(color: Colors.blueGrey),
+                      ),
+                      */
+                ],
+              ),
+              Padding(padding: EdgeInsets.only(bottom: 4)),
+              guide.helpful == 0
+                  ? Container()
+                  : Row(
+                      children: [
+                        Expanded(
+                            child: Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 10))),
+                        Text(
+                          guide.helpful.toString() +
+                              (guide.helpful >= 2
+                                  ? " people"
+                                  : guide.helpful == 1
+                                      ? " person"
+                                      : " people") +
+                              " found this helpful",
+                          style: DefaultTextStyle.of(context)
+                              .style
+                              .apply(fontSizeFactor: 0.75, color: Colors.grey),
+                        ),
+                      ],
+                    ),
+            ],
+          ),
+        ),
       ),
+      onLongPress: () async {
+        return showCupertinoModalPopup<void>(
+          context: context,
+          builder: (BuildContext context) {
+            return CupertinoActionSheet(
+              title: Text('Select option'),
+              message: Text('Was the comment helpful?'),
+              actions: <Widget>[
+                CupertinoActionSheetAction(
+                  child: Text('Helpful'),
+                  onPressed: () {
+                    globalState.rateGuide(widget.initialRecord, guide, 1);
+                    Navigator.pop(context);
+                  },
+                ),
+                CupertinoActionSheetAction(
+                  child: Text('Not helpful'),
+                  onPressed: () {
+                    globalState.rateGuide(widget.initialRecord, guide, -1);
+                    Navigator.pop(context);
+                  },
+                ),
+                CupertinoActionSheetAction(
+                  child: Text('Report'),
+                  onPressed: () {/** TODO */},
+                ),
+              ],
+              cancelButton: CupertinoActionSheetAction(
+                isDefaultAction: true,
+                child: Text('Cancel'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }
@@ -303,111 +456,9 @@ class MoodDetailState extends State<MoodDetail> {
     //header = MoodHeader(record);
     title = MoodTitle(record);
     buttons = MoodButtons(record, callbackMoodDetail);
+    guides = MoodGuides(initialRecord: record);
     setState(() => {});
   }
-
-  //Color color = Theme.of(context).primaryColor;
-  Widget _titleSection() => Container(
-        padding: const EdgeInsets.all(32),
-        child: Row(
-          children: [
-            Expanded(
-              /*An expanded widget expands the column to fit the full size.*/
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  /*2 Creating a container here instead of a Text allows us to add padding!*/
-
-                  Container(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: Text(
-                      record.name,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  Text(
-                    'Kandersteg, Switzerland',
-                    style: TextStyle(
-                      color: Colors.grey,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            /*3 all part of the same row, sample icon */
-            Icon(
-              Icons.star,
-              color: Colors.green,
-            ),
-            Text(record.unweightedScore.toStringAsFixed(1)),
-          ],
-        ),
-      );
-
-  Widget _guideSection() => Container(
-        padding: const EdgeInsets.all(32),
-        child:
-            /*
-        return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance
-          .collection('moods')
-          .where("search_terms", arrayContainsAny: searchTerms)
-          .limit(20)
-          .snapshots(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) return LinearProgressIndicator();
-        return _buildList(context, snapshot.data.documents, query);
-      },
-    );
-    */
-            Text(
-          'Let me excite you for bubble watching. Next time you come '
-          'across an aquarium don\'t bother with the fish but see if '
-          'there is a bubble machine. If the bubbles come out at the right '
-          'speed it is more interesting than watching a horse race. '
-          'The bubbles form teams in forms of rafts, can spontaneously explode '
-          'or merge with other bubbles. Similarly if you are next to a lake/ocean, '
-          'stop and adore the physics of bubbles.'
-          'Let me excite you for bubble watching. Next time you come '
-          'across an aquarium don\'t bother with the fish but see if '
-          'there is a bubble machine. If the bubbles come out at the right '
-          'speed it is more interesting than watching a horse race. '
-          'The bubbles form teams in forms of rafts, can spontaneously explode '
-          'or merge with other bubbles. Similarly if you are next to a lake/ocean, '
-          'stop and adore the physics of bubbles.'
-          'Let me excite you for bubble watching. Next time you come '
-          'across an aquarium don\'t bother with the fish but see if '
-          'there is a bubble machine. If the bubbles come out at the right '
-          'speed it is more interesting than watching a horse race. '
-          'The bubbles form teams in forms of rafts, can spontaneously explode '
-          'or merge with other bubbles. Similarly if you are next to a lake/ocean, '
-          'stop and adore the physics of bubbles.'
-          'Let me excite you for bubble watching. Next time you come '
-          'across an aquarium don\'t bother with the fish but see if '
-          'there is a bubble machine. If the bubbles come out at the right '
-          'speed it is more interesting than watching a horse race. '
-          'The bubbles form teams in forms of rafts, can spontaneously explode '
-          'or merge with other bubbles. Similarly if you are next to a lake/ocean, '
-          'stop and adore the physics of bubbles.'
-          'Let me excite you for bubble watching. Next time you come '
-          'across an aquarium don\'t bother with the fish but see if '
-          'there is a bubble machine. If the bubbles come out at the right '
-          'speed it is more interesting than watching a horse race. '
-          'The bubbles form teams in forms of rafts, can spontaneously explode '
-          'or merge with other bubbles. Similarly if you are next to a lake/ocean, '
-          'stop and adore the physics of bubbles.'
-          'Let me excite you for bubble watching. Next time you come '
-          'across an aquarium don\'t bother with the fish but see if '
-          'there is a bubble machine. If the bubbles come out at the right '
-          'speed it is more interesting than watching a horse race. '
-          'The bubbles form teams in forms of rafts, can spontaneously explode '
-          'or merge with other bubbles. Similarly if you are next to a lake/ocean, '
-          'stop and adore the physics of bubbles.',
-          softWrap: true,
-        ),
-      );
 
   @override
   Widget build(BuildContext context) {
@@ -426,7 +477,7 @@ class MoodDetailState extends State<MoodDetail> {
                 pinned: true, floating: false, delegate: title),
             SliverPersistentHeader(
                 pinned: false, floating: false, delegate: buttons),
-            SliverToBoxAdapter(child: guides)
+            guides,
           ],
         ));
   }

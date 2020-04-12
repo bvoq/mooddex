@@ -22,14 +22,15 @@ class _SplashPageState extends State<SplashPage> {
           MaterialPageRoute(builder: (context) => LoginPage()),
         );
       } else {
-        globalState.setUser(currentUser);
-        Firestore.instance
-            .collection("users")
-            .document(currentUser.uid)
-            .get()
-            .then((DocumentSnapshot result) => Navigator.pushReplacement(
-                context, MaterialPageRoute(builder: (context) => MoodHome())))
-            .catchError((err) => debugPrint(err));
+        globalState.setUser(currentUser).then((val) {
+          Firestore.instance
+              .collection("users")
+              .document(currentUser.uid)
+              .get()
+              .then((DocumentSnapshot result) => Navigator.pushReplacement(
+                  context, MaterialPageRoute(builder: (context) => MoodHome())))
+              .catchError((err) => debugPrint(err));
+        });
       }
     }).catchError((err) => debugPrint(err));
     super.initState();

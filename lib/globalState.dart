@@ -3,77 +3,97 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:flutter/foundation.dart';
 
+import 'guide.dart';
 import 'record.dart';
 
 class RecordUser {
-  String searchName;
+  final String searchName;
+  final String name;
+  final DocumentReference reference;
+  final String imageURL;
+
+  String image;
+
   int category;
   int rating;
   bool hasGuide;
   String guideText;
 
-  RecordUser(String na, int ra, int ca, String gt)
-      : searchName = na,
+  RecordUser(String sn, String na, DocumentReference dr, String im, int ra,
+      int ca, String gu)
+      : searchName = sn,
+        name = na,
         rating = ra,
+        reference = dr,
+        imageURL = im,
         category = ca,
-        guideText = gt;
+        guideText = gu;
 
   RecordUser.fromMap(Map<String, dynamic> map)
-      : assert(map["na"] != null),
+      : assert(map["sn"] != null),
+        assert(map["na"] != null),
+        assert(map["dr"] != null),
+        assert(map["im"] != null),
         assert(map["ra"] != null),
         assert(map["ca"] != null),
-        assert(map["gt"] != null),
-        searchName = map["na"],
+        assert(map["gu"] != null),
+        searchName = map["sn"],
+        name = map["na"],
+        reference = map["dr"],
+        imageURL = map["im"],
         category = map["ca"],
         rating = map["ra"],
-        guideText = map["gt"];
+        guideText = map["gu"];
 
   RecordUser.fromSnapshot(DocumentSnapshot snapshot)
       : this.fromMap(snapshot.data);
 }
 
 class GlobalState {
-  FirebaseUser _user;
-  DocumentReference _userReference;
+  FirebaseUser user;
+  DocumentReference userReference;
+  String userName;
+
   int globalStateIndex; //starts at 0 and will be increased atomically step-by-step on every update.
   Map<String, RecordUser> userRecords;
+  List<Function> updateTheseWidgetsOnUpdate;
 
   GlobalState()
-      : _user = null,
+      : user = null,
         userRecords = Map<String, RecordUser>(),
-        globalStateIndex = -1;
-  Future<void> setUser(FirebaseUser user) async {
-    debugPrint("Bonjorno");
-    _user = user;
-    _userReference = Firestore.instance.collection("users").document(user.uid);
+        globalStateIndex = -1,
+        updateTheseWidgetsOnUpdate = [],
+        userName = "";
 
-    if (globalStateIndex == -1) {
-      debugPrint("Bonjornoko");
+  void addUpdateFunction(Function toCall) {
+    updateTheseWidgetsOnUpdate.add(toCall);
+  }
 
-      DocumentSnapshot ds = await _userReference.get();
-      debugPrint("ds get");
+  Future<void> setUser(FirebaseUser newUser) async {
+    user = newUser;
+    userReference =
+        Firestore.instance.collection("users").document(newUser.uid);
 
-      assert(ds.data["globalState"] != null);
-      globalStateIndex = ds.data["globalState"];
+    DocumentSnapshot ds = await userReference.get();
 
-      QuerySnapshot snap = await _userReference
-          .collection("mymoods")
-          .limit(10000)
-          .getDocuments();
-      List<DocumentSnapshot> snaps = snap.documents;
-      for (int i = 0; i < snaps.length; ++i) {
-        RecordUser userRecord = RecordUser(snaps[i].data["na"],
-            snaps[i].data["ra"], snaps[i].data["ca"], snaps[i].data["gu"]);
-        userRecords[userRecord.searchName] = userRecord;
-      }
-      debugPrint("done getting");
+    assert(ds.data["globalState"] != null);
+
+    globalStateIndex = ds.data["globalState"];
+    if (ds.data["username"] != null) userName = ds.data["username"];
+
+    QuerySnapshot snap =
+        await userReference.collection("mymoods").limit(10000).getDocuments();
+    List<DocumentSnapshot> snaps = snap.documents;
+    for (int i = 0; i < snaps.length; ++i) {
+      RecordUser userRecord = RecordUser.fromSnapshot(snaps[i]);
+      userRecords[userRecord.searchName] = userRecord;
     }
 
     return;
   }
 
   FirebaseUser getUser() {
-    return _user;
+    return user;
   }
 
   Future<Record> addRating(Record r, int rating, int category) async {
@@ -83,17 +103,20 @@ class GlobalState {
     String guideText = "";
     await Firestore.instance.runTransaction((transaction) async {
       DocumentSnapshot ds = await transaction
-          .get(_userReference.collection("mymoods").document(r.searchName));
+          .get(userReference.collection("mymoods").document(r.searchName));
       if (ds.exists) {
         //check what the score is and modify it
+        assert(ds.data["sn"] != null);
+        assert(ds.data["na"] != null);
         assert(ds.data["ra"] != null);
+        assert(ds.data["im"] != null);
         assert(ds.data["ca"] != null);
         assert(ds.data["gu"] != null);
         guideText = ds.data["gu"];
         previousRating = ds.data["ra"];
         if (guideText.length > 0) {
           await transaction
-              .update(r.reference.collection("guides").document(_user.uid), {
+              .update(r.reference.collection("guides").document(user.uid), {
             "ra": rating,
             "ca": category,
           });
@@ -109,24 +132,27 @@ class GlobalState {
           });
         }
         await transaction.update(
-            _userReference.collection("mymoods").document(r.searchName), {
+            userReference.collection("mymoods").document(r.searchName), {
           "ra": rating,
           "ca": category,
         });
       } else {
         await transaction
-            .set(_userReference.collection("mymoods").document(r.searchName), {
-          "na": r.searchName,
+            .set(userReference.collection("mymoods").document(r.searchName), {
+          "na": r.name,
+          "sn": r.searchName,
+          "dr": r.reference,
+          "im": r.imageURL,
+          "gu": "",
           "ra": rating,
           "ca": category,
-          "gu": "",
         });
 
         await transaction.update(r.reference, {
           "votes_" + rating.toString(): FieldValue.increment(1),
         });
       }
-      await transaction.update(_userReference, {
+      await transaction.update(userReference, {
         "globalState": FieldValue.increment(1),
       });
     }).then((res) {
@@ -138,34 +164,44 @@ class GlobalState {
 
       r.updateScore(votes);
 
-      RecordUser ru = RecordUser(r.searchName, rating, category, guideText);
+      RecordUser ru = RecordUser(r.searchName, r.name, r.reference, r.imageURL,
+          rating, category, guideText);
       userRecords[r.searchName] = ru;
+
+      for (int i = 0; i < updateTheseWidgetsOnUpdate.length; ++i) {
+        try {
+          updateTheseWidgetsOnUpdate[i]();
+        } catch (e) {}
+      }
     });
 
     return r;
   }
 
-  void addGuide(Record r, String guideText) async {
+  Future<void> addGuide(Record r, String guideText) async {
     RecordUser recordUser;
     if (userRecords.containsKey(r.searchName)) {
       recordUser = userRecords[r.searchName];
+      recordUser.guideText = guideText;
     } else {
-      recordUser = RecordUser(r.searchName, 0, 0, guideText);
+      recordUser = RecordUser(
+          r.searchName, r.name, r.reference, r.imageURL, 0, 0, guideText);
     }
     WriteBatch batch = Firestore.instance.batch();
-    batch.setData(r.reference.collection("guides").document(_user.uid), {
-      "au": _user.uid,
+    batch.setData(r.reference.collection("guides").document(user.uid), {
+      "uid": user.uid,
       "gu": guideText,
       "ra": recordUser.rating,
       "ca": recordUser.category,
+      "hf": 0,
       "ts": FieldValue.serverTimestamp(),
     });
     batch.updateData(
-        _userReference.collection("mymoods").document(r.searchName), {
+        userReference.collection("mymoods").document(r.searchName), {
       "gu": guideText,
     });
 
-    batch.updateData(_userReference, {
+    batch.updateData(userReference, {
       "globalState": FieldValue.increment(1),
     });
 
@@ -175,6 +211,48 @@ class GlobalState {
         userRecords[r.searchName] = recordUser;
       } else {
         userRecords[r.searchName] = recordUser;
+      }
+
+      for (int i = 0; i < updateTheseWidgetsOnUpdate.length; ++i) {
+        try {
+          updateTheseWidgetsOnUpdate[i]();
+        } catch (e) {}
+      }
+    });
+    return;
+  }
+
+  void rateGuide(Record r, Guide guide, int vote) async {
+    assert(vote == 1 || vote == -1 || vote == 0);
+    DocumentReference guidereference =
+        r.reference.collection("guides").document(guide.author_uid);
+    DocumentReference uservoteonguide = userReference
+        .collection("myguidevotes")
+        .document(r.searchName)
+        .collection("comments")
+        .document(guide.author_uid);
+    await Firestore.instance.runTransaction((transaction) async {
+      DocumentSnapshot ds = await transaction.get(uservoteonguide);
+      if (ds.exists && ds.data["hf"] != null && ds.data["hf"] != 0) {
+        if (ds.data["hf"] == 0 ||
+            (ds.data["hf"] == 1 && vote == -1) ||
+            (ds.data["hf"] == -1 && vote == 1)) {
+          assert(ds.data["hf"] != null);
+          transaction.update(guidereference, {
+            "hf": ds.data["hf"] == 0
+                ? FieldValue.increment(vote)
+                : FieldValue.increment(2 * vote)
+          });
+
+          await transaction.update(uservoteonguide, {
+            "hf": vote,
+          });
+        }
+      } else {
+        transaction.update(guidereference, {"hf": FieldValue.increment(vote)});
+        transaction.set(uservoteonguide, {
+          "hf": vote,
+        });
       }
     });
   }

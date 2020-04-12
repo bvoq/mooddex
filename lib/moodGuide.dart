@@ -7,7 +7,9 @@ import 'record.dart';
 
 class MoodGuide extends StatefulWidget {
   final Record record;
-  MoodGuide({Key key, @required this.record}) : super(key: key);
+  final Function callbackMoodDetail;
+  MoodGuide({Key key, @required this.record, @required this.callbackMoodDetail})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() => MoodGuideState(record.searchName);
@@ -98,6 +100,7 @@ class MoodGuideState extends State<MoodGuide> {
                       maxHeight: MediaQuery.of(context).size.height * 0.4,
                     ),
                     child: TextField(
+                      style: TextStyle(fontSize: 14),
                       decoration: InputDecoration(
                           focusedBorder: OutlineInputBorder(
                             borderSide:
@@ -112,6 +115,7 @@ class MoodGuideState extends State<MoodGuide> {
                       textInputAction: TextInputAction.newline,
                       keyboardType: TextInputType.multiline,
                       maxLines: null,
+                      maxLength: 50000,
                       controller: _moodGuideController,
                     ),
                   ),
@@ -121,14 +125,24 @@ class MoodGuideState extends State<MoodGuide> {
                   padding: const EdgeInsets.only(left: 3, top: 48, bottom: 0),
                   child: CupertinoDialogAction(
                     isDefaultAction: true,
-                    child: new Text("Add guide"),
-                    onPressed: () {
+                    child: new Text(globalState.userRecords
+                                .containsKey(widget.record.searchName) &&
+                            globalState.userRecords[widget.record.searchName]
+                                    .guideText.length >
+                                0
+                        ? "Edit guide"
+                        : "Add guide"),
+                    onPressed: () async {
                       assert(widget.record != null);
                       debugPrint("adding guide: " + widget.record.searchName);
-                      globalState.addGuide(
+                      globalState
+                          .addGuide(
                         widget.record,
                         _moodGuideController.text,
-                      );
+                      )
+                          .then((val) {
+                        widget.callbackMoodDetail(widget.record);
+                      });
                       Navigator.of(context).pop();
                     },
                   )),
