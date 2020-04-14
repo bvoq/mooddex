@@ -35,7 +35,7 @@ Widget _addNewMood(BuildContext context, String query) {
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Container(
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.green),
+          border: Border.all(color: Theme.of(context).accentColor),
           borderRadius: BorderRadius.circular(5.0),
         ),
         child: Row(
@@ -43,7 +43,8 @@ Widget _addNewMood(BuildContext context, String query) {
             Expanded(
                 child: ListTile(
                     title: Text("Add mood: " + query),
-                    leading: Icon(Icons.add, color: Colors.green),
+                    leading:
+                        Icon(Icons.add, color: Theme.of(context).accentColor),
                     onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(

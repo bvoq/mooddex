@@ -21,6 +21,7 @@ class MoodAddState extends State<MoodAdd> {
   final GlobalKey<FormState> _loginFormKey = GlobalKey<FormState>();
 
   TextEditingController _nameController;
+  TextEditingController _linkController;
   ImageChooser _imageChooser;
   File _imageFile;
   bool triedSubmittingButFailed = false;
@@ -28,6 +29,7 @@ class MoodAddState extends State<MoodAdd> {
 
   MoodAddState(String queryName) {
     _nameController = TextEditingController(text: queryName);
+    _linkController = TextEditingController();
     _imageFile = null;
   }
 
@@ -39,6 +41,12 @@ class MoodAddState extends State<MoodAdd> {
       return 'Name must be longer than 4 characters';
     }
     return null;
+  }
+
+  String _linkValidator(String value) {
+    if (value == null || value.length == 0) return null;
+    if (Uri.parse(value).isAbsolute) return null;
+    return "Not a valid absolute link.";
   }
 
   void publishWidgetAndUpdateScreen(BuildContext context) {
@@ -54,13 +62,15 @@ class MoodAddState extends State<MoodAdd> {
 
       success.then((value) {
         if (r.uploaded) {
-          //r.loadImageFromFirebase().then((void v) {
-          Navigator.pop(context);
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => MoodDetail(initialRecord: r),
-              ));
+          globalState.addRating(r, 0, 0).then((vo) {
+            //r.loadImageFromFirebase().then((void v) {
+            Navigator.pop(context);
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MoodDetail(initialRecord: r),
+                ));
+          });
         } else {}
       });
       //add zero ratings
@@ -81,24 +91,11 @@ class MoodAddState extends State<MoodAdd> {
     );
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Add Mood'),
-        actions: <Widget>[
-          IconButton(
-              icon: Icon(Icons.queue),
-              onPressed: () {
-                if (_loginFormKey.currentState.validate()) {
-                  publishWidgetAndUpdateScreen(context);
-                }
-                triedSubmittingButFailed = true;
-                setState(() => {});
-              }),
-        ],
-      ),
       body: Form(
         key: _loginFormKey,
         child: Column(
           children: [
+            CupertinoNavigationBar(middle: Text("Add mood")),
             _imageChooser,
             Padding(
               padding:
@@ -106,7 +103,7 @@ class MoodAddState extends State<MoodAdd> {
             ),
             Padding(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    const EdgeInsets.only(left: 16.0, right: 16.0, top: 8.0),
                 child: TextFormField(
                   autocorrect: false,
                   decoration: InputDecoration(
@@ -117,9 +114,22 @@ class MoodAddState extends State<MoodAdd> {
                   validator: _nameValidator,
                 )),
             Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0.0),
+                child: TextFormField(
+                  autocorrect: false,
+                  decoration: InputDecoration(
+                      labelText: 'Link (optional)', hintText: 'https://...'),
+                  controller: _linkController,
+                  obscureText: false,
+                  maxLength: 45,
+                  validator: _linkValidator,
+                )),
+            Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             ),
+
             Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -216,13 +226,20 @@ class ImageChooserState extends State<ImageChooser> {
     super.dispose();
   }
 
-  Widget _previewImage() {
+  Widget _previewImage(BuildContext context) {
     final Text retrieveError = _getRetrieveErrorWidget();
     if (retrieveError != null) {
       return retrieveError;
     }
     if (_imageFile != null) {
-      return Image.file(_imageFile);
+      return ConstrainedBox(
+          constraints: new BoxConstraints(
+            minHeight: 0,
+            minWidth: 0,
+            maxHeight: 235,
+            maxWidth: MediaQuery.of(context).size.width,
+          ),
+          child: Image.file(_imageFile, fit: BoxFit.cover));
     } else if (_pickImageError != null) {
       return Text(
         'Pick image error: $_pickImageError',
@@ -279,7 +296,7 @@ class ImageChooserState extends State<ImageChooser> {
                         style: TextStyle(color: widget.errorColor),
                       );
                     case ConnectionState.done:
-                      return _previewImage();
+                      return _previewImage(context);
                     default:
                       if (snapshot.hasError) {
                         return Text(
@@ -296,7 +313,7 @@ class ImageChooserState extends State<ImageChooser> {
                   }
                 },
               )
-            : _previewImage()
+            : _previewImage(context)
       ],
     );
     /*

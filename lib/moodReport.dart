@@ -8,8 +8,12 @@ import 'record.dart';
 class MoodReport extends StatefulWidget {
   final String reportType;
   final String reportLocation;
+  final String reportDescription;
   MoodReport(
-      {Key key, @required this.reportType, @required this.reportLocation})
+      {Key key,
+      @required this.reportType,
+      @required this.reportLocation,
+      @required this.reportDescription})
       : super(key: key);
 
   @override
@@ -57,9 +61,7 @@ class MoodReportState extends State<MoodReport> {
             ),
             Padding(
               padding: const EdgeInsets.only(left: 3, bottom: 6),
-              child: Text("What about this " +
-                  widget.reportType +
-                  " constitutes an App Store violation?\n"),
+              child: Text(widget.reportDescription),
             ),
             Padding(
               padding: const EdgeInsets.only(left: 3, top: 16, bottom: 8),
@@ -85,7 +87,7 @@ class MoodReportState extends State<MoodReport> {
                     textInputAction: TextInputAction.newline,
                     keyboardType: TextInputType.multiline,
                     maxLines: null,
-                    maxLength: 50000,
+                    maxLength: 20000,
                     controller: _reportController,
                   ),
                 ),
@@ -95,7 +97,7 @@ class MoodReportState extends State<MoodReport> {
                 padding: const EdgeInsets.only(left: 3, top: 48, bottom: 0),
                 child: CupertinoDialogAction(
                   isDefaultAction: true,
-                  child: Text("Create report"),
+                  child: Text("Create " + widget.reportType),
                   onPressed: () async {
                     await Firestore.instance.collection("reports").add({
                       "rt": widget.reportType,

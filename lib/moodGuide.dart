@@ -114,7 +114,7 @@ class MoodGuideState extends State<MoodGuide> {
                       textInputAction: TextInputAction.newline,
                       keyboardType: TextInputType.multiline,
                       maxLines: null,
-                      maxLength: 50000,
+                      maxLength: 20000,
                       controller: _moodGuideController,
                     ),
                   ),

@@ -1,8 +1,11 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'moodSearch.dart';
 import 'moodDetail.dart';
+import 'moodReport.dart';
 import 'globalState.dart';
 import 'login.dart';
 import 'record.dart';
@@ -248,7 +251,7 @@ class MoodHomeState extends State<MoodHome> {
                       CupertinoNavigationBar(middle: Text("My Profile")),
                       Spacer(flex: 1),
                       Text("User: " + globalState.userName),
-                      Spacer(flex: 2),
+                      Spacer(flex: 6),
                       globalState.user.isAnonymous
                           ? Center(
                               child: RaisedButton(
@@ -279,6 +282,23 @@ class MoodHomeState extends State<MoodHome> {
                                   ));
                             }),
                       ),
+                      Spacer(flex: 1),
+                      CupertinoButton(
+                          child: Text("Give feedback"),
+                          onPressed: () {
+                            showDialog(
+                                context: context,
+                                builder: (BuildContext context) => MoodReport(
+                                    reportType: "feedback",
+                                    reportLocation: "other_" +
+                                        (new DateTime.now())
+                                            .millisecondsSinceEpoch
+                                            .toString() +
+                                        "_" +
+                                        globalState.getUser().uid,
+                                    reportDescription:
+                                        "Please type your feedback here.\n"));
+                          }),
                       Spacer(flex: 2),
                     ],
                   ),

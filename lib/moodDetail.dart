@@ -35,7 +35,7 @@ class MoodHeader extends SliverPersistentHeaderDelegate {
                       style: TextStyle(color: Colors.grey)));
             } else {
               return Image.file(File(record.image),
-                  width: size.width, fit: BoxFit.fitWidth);
+                  width: size.width, height: 400, fit: BoxFit.cover);
             }
           } else {
             return Center(child: CircularProgressIndicator());
@@ -53,7 +53,7 @@ class MoodHeader extends SliverPersistentHeaderDelegate {
   bool shouldRebuild(SliverPersistentHeaderDelegate _) => true;
 
   @override
-  double get maxExtent => 235; //modify for tablet!! 480
+  double get maxExtent => 400; //modify for tablet!! 480
 
   @override
   double get minExtent => 0;
@@ -415,7 +415,9 @@ class MoodGuidesState extends State<MoodGuides> {
                             reportLocation:
                                 widget.initialRecord.reference.documentID +
                                     "_" +
-                                    guide.uid));
+                                    guide.uid,
+                            reportDescription:
+                                "What about this comment constitutes an App Store violation?\n"));
                   },
                 ),
               ],
