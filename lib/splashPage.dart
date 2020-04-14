@@ -17,10 +17,22 @@ class _SplashPageState extends State<SplashPage> {
   initState() {
     FirebaseAuth.instance.currentUser().then((currentUser) {
       if (currentUser == null) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => LoginPage()),
-        );
+        //create an anonymous user instead
+        FirebaseAuth.instance.signInAnonymously().then((AuthResult res) =>
+            globalState
+                .registerUser(res.user, "anonymous", "")
+                .then((val) => globalState.setUser(res.user).then((val) {
+                      Firestore.instance
+                          .collection("users")
+                          .document(res.user.uid)
+                          .get()
+                          .then((DocumentSnapshot result) =>
+                              Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => MoodHome())))
+                          .catchError((err) => debugPrint(err));
+                    })));
       } else {
         globalState.setUser(currentUser).then((val) {
           Firestore.instance

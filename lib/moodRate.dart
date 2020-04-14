@@ -12,23 +12,23 @@ class MoodRate extends StatefulWidget {
       : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => MoodRateState(record.searchName);
+  State<StatefulWidget> createState() => MoodRateState(record.collectionName);
 }
 
 class MoodRateState extends State<MoodRate> {
   double _ratingForStars;
   int rating;
   int category;
-  MoodRateState(String searchName)
+  MoodRateState(String collectionName)
       : _ratingForStars = 0,
         rating = 0,
         category = 0 {
     assert(globalState.userRecords != null);
 
-    if (globalState.userRecords.containsKey(searchName)) {
-      rating = globalState.userRecords[searchName].rating;
+    if (globalState.userRecords.containsKey(collectionName)) {
+      rating = globalState.userRecords[collectionName].rating;
       _ratingForStars = rating.toDouble();
-      category = globalState.userRecords[searchName].category;
+      category = globalState.userRecords[collectionName].category;
     }
   }
 
@@ -116,12 +116,13 @@ class MoodRateState extends State<MoodRate> {
                   child: CupertinoDialogAction(
                     isDefaultAction: true,
                     child: globalState.userRecords
-                            .containsKey(widget.record.searchName)
+                            .containsKey(widget.record.collectionName)
                         ? Text("Change rating")
                         : Text("Add mood"),
                     onPressed: () {
                       assert(widget.record != null);
-                      debugPrint("adding mood: " + widget.record.searchName);
+                      debugPrint(
+                          "adding mood: " + widget.record.collectionName);
                       Navigator.of(context).pop();
                       globalState
                           .addRating(widget.record, rating, category)

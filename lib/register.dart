@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'globalState.dart';
 import 'moodHome.dart';
 import 'stopwords.dart';
+import 'login.dart';
 
 class RegisterPage extends StatefulWidget {
   RegisterPage({Key key}) : super(key: key);
@@ -63,7 +64,9 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("Register"),
+          title: Text(globalState.user.isAnonymous
+              ? "Register and link account"
+              : "Create a new account"),
         ),
         body: Container(
             padding: const EdgeInsets.all(20.0),
@@ -115,35 +118,62 @@ class _RegisterPageState extends State<RegisterPage> {
                         debugPrint("validated locally");
 
                         try {
-                          FirebaseAuth.instance
-                              .createUserWithEmailAndPassword(
-                                  email: emailInputController.text,
-                                  password: pwdInputController.text)
-                              .catchError((error) => debugPrint(
-                                  "create user error: " + error.toString()))
-                              .then((currentUser) {
-                            Firestore.instance
-                                .collection("users")
-                                .document(currentUser.user.uid)
-                                .setData({
-                              "uid": currentUser.user.uid,
-                              "username": userNameInputController.text,
-                              "email": emailInputController.text,
-                              "globalState": 0,
-                            }).then((result) {
-                              globalState.setUser(currentUser.user);
+                          if (globalState.user.isAnonymous) {
+                            AuthCredential credential =
+                                EmailAuthProvider.getCredential(
+                                    email: emailInputController.text,
+                                    password: pwdInputController.text);
 
-                              Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => MoodHome()),
-                                  (_) => false);
-                              userNameInputController.clear();
-                              emailInputController.clear();
-                              pwdInputController.clear();
-                              confirmPwdInputController.clear();
+                            globalState.user
+                                .linkWithCredential(credential)
+                                .then((authres) {
+                              globalState
+                                  .registerUser(
+                                      authres.user,
+                                      userNameInputController.text,
+                                      emailInputController.text)
+                                  .then((vo) {
+                                globalState.setUser(authres.user).then((vo) {
+                                  Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => MoodHome()),
+                                      (_) => false);
+                                  userNameInputController.clear();
+                                  emailInputController.clear();
+                                  pwdInputController.clear();
+                                  confirmPwdInputController.clear();
+                                });
+                              });
                             });
-                          });
+                          } else {
+                            FirebaseAuth.instance
+                                .createUserWithEmailAndPassword(
+                                    email: emailInputController.text,
+                                    password: pwdInputController.text)
+                                .catchError((error) => debugPrint(
+                                    "create user error: " + error.toString()))
+                                .then((authres) {
+                              globalState
+                                  .registerUser(
+                                      authres.user,
+                                      userNameInputController.text,
+                                      emailInputController.text)
+                                  .then((result) {
+                                globalState.setUser(authres.user).then((vo) {
+                                  Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => MoodHome()),
+                                      (_) => false);
+                                  userNameInputController.clear();
+                                  emailInputController.clear();
+                                  pwdInputController.clear();
+                                  confirmPwdInputController.clear();
+                                });
+                              });
+                            });
+                          }
                         } catch (error) {
                           debugPrint("register error: " + error.toString());
                         }
@@ -183,9 +213,12 @@ class _RegisterPageState extends State<RegisterPage> {
                   FlatButton(
                     child: Text("Login here!"),
                     onPressed: () {
-                      Navigator.pop(context);
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => LoginPage()),
+                      );
                     },
-                  )
+                  ),
                 ],
               ),
             ))));

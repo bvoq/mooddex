@@ -87,7 +87,8 @@ Widget _searchSuggestions(String query) {
     return StreamBuilder<QuerySnapshot>(
       stream: Firestore.instance
           .collection('moods')
-          .where("search_terms", arrayContainsAny: searchTerms)
+          .where('searchable', isEqualTo: true)
+          .where('search_terms', arrayContainsAny: searchTerms)
           .limit(20)
           .snapshots(),
       builder: (context, snapshot) {

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:image_picker/image_picker.dart';
 
+import 'globalState.dart';
 import 'moodDetail.dart';
 import 'record.dart';
 
@@ -23,6 +24,7 @@ class MoodAddState extends State<MoodAdd> {
   ImageChooser _imageChooser;
   File _imageFile;
   bool triedSubmittingButFailed = false;
+  int searchable = 0;
 
   MoodAddState(String queryName) {
     _nameController = TextEditingController(text: queryName);
@@ -43,7 +45,11 @@ class MoodAddState extends State<MoodAdd> {
     if (_imageFile != null) {
       debugPrint('Publishing the mood ' + _nameController.text);
       Record r = Record.fromInitializer(
-          _nameController.text, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], _imageFile);
+          _nameController.text,
+          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+          _imageFile,
+          searchable == 0,
+          globalState.getUser().uid);
       Future<void> success = r.publish();
 
       success.then((value) {
@@ -114,7 +120,40 @@ class MoodAddState extends State<MoodAdd> {
               padding:
                   const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             ),
-            Text('Similarly named moods'),
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: Text('Privacy:'),
+            ),
+            CupertinoSlidingSegmentedControl(
+                groupValue: searchable,
+                children: const <int, Widget>{
+                  0: Padding(
+                      padding: const EdgeInsets.only(left: 6, right: 6),
+                      child: Text("Publicly searchable")),
+                  1: Padding(
+                      padding: const EdgeInsets.only(left: 6, right: 6),
+                      child: Text("Privately shareable")),
+                },
+                onValueChanged: (i) {
+                  setState(() {
+                    searchable = i;
+                  });
+                }),
+            Spacer(flex: 5),
+            CupertinoDialogAction(
+              isDefaultAction: true,
+              child: new Text("Add mood"),
+              onPressed: () async {
+                if (_loginFormKey.currentState.validate()) {
+                  publishWidgetAndUpdateScreen(context);
+                }
+                triedSubmittingButFailed = true;
+                setState(() => {});
+              },
+            ),
+            Spacer(flex: 1),
+//            Text('Similarly named moods'),
           ],
         ),
       ),

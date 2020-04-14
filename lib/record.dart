@@ -24,7 +24,8 @@ class IDPair {
 
 class Record {
   final String name;
-  final String searchName;
+  final String author;
+  final String collectionName;
 
   List<int> votes;
   int totalvotes;
@@ -36,6 +37,7 @@ class Record {
   double score;
   bool uploaded;
   DocumentReference reference;
+  final bool searchable;
   /*Record()
       : name = "",
         added = 0,
@@ -67,13 +69,9 @@ class Record {
         assert(map['votes_10'] != null),
         assert(map['search_terms'] != null),
         assert(map['image_ref'] != null),
+        assert(map['searchable'] != null),
+        assert(map['author'] != null),
         name = map['name'],
-        searchName = map['name']
-            .toString()
-            .toLowerCase()
-            .toUpperCase()
-            .toLowerCase()
-            .replaceAll(" ", "_"),
         added = map['added'],
         //votes = map['votes'].cast<int>(),
         votes = [
@@ -93,29 +91,45 @@ class Record {
         uploaded = true,
         imageURL = map['image_ref'],
         imageFileToBeUploaded = null,
-        image = null {
+        image = null,
+        searchable = map['searchable'],
+        author = map['author'],
+        collectionName = map['name']
+                .toString()
+                .toLowerCase()
+                .toUpperCase()
+                .toLowerCase()
+                .replaceAll(" ", "_") +
+            "_" +
+            map['author'] +
+            (map['searchable'] ? "_0" : "_1") {
     updateScore(votes);
   }
 
   Record.fromSnapshot(DocumentSnapshot snapshot)
       : this.fromMap(snapshot.data, reference: snapshot.reference);
 
-  Record.fromInitializer(
-      String name, List<int> votes, File imageFileToBeUploaded)
+  Record.fromInitializer(String name, List<int> votes,
+      File imageFileToBeUploaded, bool searchable, String author)
       : assert(votes.length == 10),
         assert(name.length > 3 && name.length <= 45),
         name = name,
-        searchName = name
-            .toString()
-            .toLowerCase()
-            .toUpperCase()
-            .toLowerCase()
-            .replaceAll(" ", "_"),
         votes = votes,
         imageFileToBeUploaded = imageFileToBeUploaded,
+        searchable = searchable,
         uploaded = false,
         image = null,
-        reference = null {
+        reference = null,
+        author = author,
+        collectionName = name
+                .toString()
+                .toLowerCase()
+                .toUpperCase()
+                .toLowerCase()
+                .replaceAll(" ", "_") +
+            "_" +
+            author +
+            (searchable ? "_0" : "_1") {
     updateScore(votes);
     imageURL = "";
   }
@@ -142,7 +156,7 @@ class Record {
       Directory documentDirectory = await getApplicationDocumentsDirectory();
       String firstPath = documentDirectory.path + "/images";
       String filePathAndName =
-          documentDirectory.path + '/images/' + searchName + '.jpg';
+          documentDirectory.path + '/images/' + collectionName + '.jpg';
 
       //comment out the next three lines to 'prove' the next time that you run
       // the code to prove that it was downloaded and saved to your device
@@ -178,7 +192,7 @@ class Record {
     FirebaseStorage storage = FirebaseStorage.instance;
 
     StorageReference ref =
-        storage.ref().child("images").child(searchName + "." + extension);
+        storage.ref().child("images").child(collectionName + "." + extension);
     StorageUploadTask uploadTask = ref.putFile(imageFileToBeUploaded);
 
     String dowurl = await (await uploadTask.onComplete).ref.getDownloadURL();
@@ -189,11 +203,14 @@ class Record {
     if (uploaded == true) return;
 
     FirebaseUser user = globalState.getUser();
-    if (user == null)
+    if (user == null || user.uid != author)
       return;
     else {
-      List<String> searchWords = searchName
-          .split("_")
+      List<String> searchWords = name
+          .toLowerCase()
+          .toUpperCase()
+          .toLowerCase()
+          .split(" ")
           .where((i) => (i.length > 2 && !stopwords.contains(i)))
           .toList();
       List<String> searchTerms = [];
@@ -204,7 +221,7 @@ class Record {
       }
 
       DocumentReference _reference =
-          Firestore.instance.collection('moods').document(searchName);
+          Firestore.instance.collection('moods').document(collectionName);
       reference = _reference;
 
       DocumentSnapshot ds = await _reference.get().catchError((onError) {
@@ -233,7 +250,8 @@ class Record {
               'votes_9': 0,
               'votes_10': 0,
               'image_ref': imageURL,
-              'author': user.uid,
+              'searchable': searchable,
+              'author': author,
             }).then((onValue) {
               uploaded = true;
             }).catchError((onError) {});

@@ -132,6 +132,7 @@ class _LoginPageState extends State<LoginPage> {
                                 await FirebaseAuth.instance.currentUser();
                             globalState.setUser(u);
                             debugPrint("Hopefully not null: " + u.email);
+                            Navigator.pop(context);
                             Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
@@ -182,9 +183,9 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   Text("Don't have an account yet?"),
                   FlatButton(
-                    child: Text("Register here!"),
+                    child: Text("Create a new account"),
                     onPressed: () {
-                      Navigator.push(
+                      Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
                               builder: (context) => RegisterPage()));

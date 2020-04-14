@@ -10,6 +10,7 @@ import 'guide.dart';
 import 'record.dart';
 import 'moodRate.dart';
 import 'moodGuide.dart';
+import 'moodReport.dart';
 
 class MoodHeader extends SliverPersistentHeaderDelegate {
   final Record record;
@@ -198,7 +199,7 @@ class MoodButtons extends SliverPersistentHeaderDelegate {
           _buildButtonColumn(
               Theme.of(context).accentColor,
               Icons.thumbs_up_down,
-              globalState.userRecords.containsKey(record.searchName)
+              globalState.userRecords.containsKey(record.collectionName)
                   ? "EDIT RATING"
                   : "ADD MOOD",
               () => showDialog(
@@ -210,9 +211,9 @@ class MoodButtons extends SliverPersistentHeaderDelegate {
           _buildButtonColumn(
               Theme.of(context).accentColor,
               Icons.rate_review,
-              globalState.userRecords.containsKey(record.searchName) &&
-                      globalState
-                              .userRecords[record.searchName].guideText.length >
+              globalState.userRecords.containsKey(record.collectionName) &&
+                      globalState.userRecords[record.collectionName].guideText
+                              .length >
                           0
                   ? 'EDIT GUIDE'
                   : 'WRITE GUIDE', () {
@@ -343,7 +344,7 @@ class MoodGuidesState extends State<MoodGuides> {
                   Expanded(
                       child: Padding(
                           padding: EdgeInsets.symmetric(horizontal: 10))),
-                  Text("~ anonymous",
+                  Text("~ " + guide.author,
                       style: TextStyle(color: Colors.blueGrey, fontSize: 14)),
                   /*
                       Padding(padding: EdgeInsets.symmetric(horizontal: 10)),
@@ -405,7 +406,17 @@ class MoodGuidesState extends State<MoodGuides> {
                 ),
                 CupertinoActionSheetAction(
                   child: Text('Report'),
-                  onPressed: () {/** TODO */},
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) => MoodReport(
+                            reportType: "comment",
+                            reportLocation:
+                                widget.initialRecord.reference.documentID +
+                                    "_" +
+                                    guide.uid));
+                  },
                 ),
               ],
               cancelButton: CupertinoActionSheetAction(

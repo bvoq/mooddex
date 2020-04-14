@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'moodSearch.dart';
+import 'moodDetail.dart';
 import 'globalState.dart';
 import 'login.dart';
+import 'record.dart';
+import 'register.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 
 class MyMoods extends StatefulWidget {
@@ -35,7 +39,8 @@ class MyMoodsState extends State<MyMoods> {
     //now sort according to selected criteria.
     records.sort((a, b) {
       if (index == 0) {
-        return sortingOrders[index] * a.searchName.compareTo(b.searchName);
+        return sortingOrders[index] *
+            a.collectionName.compareTo(b.collectionName);
       } else if (index == 1) {
         return sortingOrders[index] * a.category.compareTo(b.category);
       } else if (index == 2) {
@@ -45,6 +50,20 @@ class MyMoodsState extends State<MyMoods> {
     });
 
     if (!constructor) setState(() => {}); //call build function again.
+  }
+
+  void tappedOnMood(RecordUser recordUser) {
+    DocumentReference dr = Firestore.instance
+        .collection('moods')
+        .document(recordUser.collectionName);
+    dr.get().then((DocumentSnapshot snapshot) {
+      Record record = Record.fromSnapshot(snapshot);
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MoodDetail(initialRecord: record),
+          ));
+    });
   }
 
   @override
@@ -91,21 +110,29 @@ class MyMoodsState extends State<MyMoods> {
               DataColumn(label: Container(), numeric: true),
             ],
             rows: records
-                .map((recordUser) => DataRow(cells: [
-                      DataCell(Text(recordUser.name)),
-                      DataCell(Text(recordUser.category == 0
-                          ? "I do this"
-                          : recordUser.category == 1
-                              ? "I did this"
-                              : recordUser.category == 2
-                                  ? "I will do this"
-                                  : "")),
+                .map(
+                  (recordUser) => DataRow(
+                    cells: [
+                      DataCell(Text(recordUser.name),
+                          onTap: () => tappedOnMood(recordUser)),
+                      DataCell(
+                          Text(recordUser.category == 0
+                              ? "I do this"
+                              : recordUser.category == 1
+                                  ? "I did this"
+                                  : recordUser.category == 2
+                                      ? "I will do this"
+                                      : ""),
+                          onTap: () => tappedOnMood(recordUser)),
                       DataCell(
                           Text(recordUser.rating == 0
                               ? "Unrated"
                               : recordUser.rating.toString()),
-                          placeholder: recordUser.rating == 0),
-                    ]))
+                          placeholder: recordUser.rating == 0,
+                          onTap: () => tappedOnMood(recordUser)),
+                    ],
+                  ),
+                )
                 .toList(),
           ),
         ),
@@ -222,20 +249,37 @@ class MoodHomeState extends State<MoodHome> {
                       Spacer(flex: 1),
                       Text("User: " + globalState.userName),
                       Spacer(flex: 2),
+                      globalState.user.isAnonymous
+                          ? Center(
+                              child: RaisedButton(
+                                child:
+                                    Text("Register and link anonymous account"),
+                                color: Theme.of(context).primaryColor,
+                                textColor: Colors.white,
+                                onPressed: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => RegisterPage(),
+                                      ));
+                                },
+                              ),
+                            )
+                          : Spacer(flex: 1),
                       Center(
                         child: RaisedButton(
                             child: Text("Login with a different account"),
                             color: Theme.of(context).primaryColor,
                             textColor: Colors.white,
                             onPressed: () {
-                              Navigator.pushReplacement(
+                              Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => LoginPage(),
                                   ));
                             }),
                       ),
-                      Spacer(flex: 5),
+                      Spacer(flex: 2),
                     ],
                   ),
                 )

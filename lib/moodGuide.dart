@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'globalState.dart';
@@ -12,17 +11,17 @@ class MoodGuide extends StatefulWidget {
       : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => MoodGuideState(record.searchName);
+  State<StatefulWidget> createState() => MoodGuideState(record.collectionName);
 }
 
 class MoodGuideState extends State<MoodGuide> {
   TextEditingController _moodGuideController;
 
-  MoodGuideState(String searchName) {
-    if (globalState.userRecords.containsKey(searchName) &&
-        globalState.userRecords[searchName].guideText.length > 0) {
+  MoodGuideState(String collectionName) {
+    if (globalState.userRecords.containsKey(collectionName) &&
+        globalState.userRecords[collectionName].guideText.length > 0) {
       _moodGuideController = TextEditingController(
-          text: globalState.userRecords[searchName].guideText);
+          text: globalState.userRecords[collectionName].guideText);
     } else {
       _moodGuideController = TextEditingController();
     }
@@ -30,8 +29,8 @@ class MoodGuideState extends State<MoodGuide> {
   @override
   Widget build(BuildContext context) {
     int rating = 0;
-    if (globalState.userRecords.containsKey(widget.record.searchName)) {
-      rating = globalState.userRecords[widget.record.searchName].rating;
+    if (globalState.userRecords.containsKey(widget.record.collectionName)) {
+      rating = globalState.userRecords[widget.record.collectionName].rating;
     }
     return Dialog(
       elevation: 0.0,
@@ -126,15 +125,18 @@ class MoodGuideState extends State<MoodGuide> {
                   child: CupertinoDialogAction(
                     isDefaultAction: true,
                     child: new Text(globalState.userRecords
-                                .containsKey(widget.record.searchName) &&
-                            globalState.userRecords[widget.record.searchName]
-                                    .guideText.length >
+                                .containsKey(widget.record.collectionName) &&
+                            globalState
+                                    .userRecords[widget.record.collectionName]
+                                    .guideText
+                                    .length >
                                 0
                         ? "Edit guide"
                         : "Add guide"),
                     onPressed: () async {
                       assert(widget.record != null);
-                      debugPrint("adding guide: " + widget.record.searchName);
+                      debugPrint(
+                          "adding guide: " + widget.record.collectionName);
                       globalState
                           .addGuide(
                         widget.record,
