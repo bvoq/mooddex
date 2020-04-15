@@ -26,6 +26,7 @@ class Record {
   final String name;
   final String author;
   final String collectionName;
+  final String link;
 
   List<int> votes;
   int totalvotes;
@@ -71,6 +72,7 @@ class Record {
         assert(map['image_ref'] != null),
         assert(map['searchable'] != null),
         assert(map['author'] != null),
+        assert(map['link'] != null),
         name = map['name'],
         added = map['added'],
         //votes = map['votes'].cast<int>(),
@@ -102,15 +104,21 @@ class Record {
                 .replaceAll(" ", "_") +
             "_" +
             map['author'] +
-            (map['searchable'] ? "_0" : "_1") {
+            (map['searchable'] ? "_0" : "_1"),
+        link = map['link'] {
     updateScore(votes);
   }
 
   Record.fromSnapshot(DocumentSnapshot snapshot)
       : this.fromMap(snapshot.data, reference: snapshot.reference);
 
-  Record.fromInitializer(String name, List<int> votes,
-      File imageFileToBeUploaded, bool searchable, String author)
+  Record.fromInitializer(
+      {String name,
+      List<int> votes,
+      File imageFileToBeUploaded,
+      bool searchable,
+      String author,
+      String link})
       : assert(votes.length == 10),
         assert(name.length > 3 && name.length <= 45),
         name = name,
@@ -129,7 +137,8 @@ class Record {
                 .replaceAll(" ", "_") +
             "_" +
             author +
-            (searchable ? "_0" : "_1") {
+            (searchable ? "_0" : "_1"),
+        link = link {
     updateScore(votes);
     imageURL = "";
   }
@@ -213,6 +222,10 @@ class Record {
           .split(" ")
           .where((i) => (i.length > 2 && !stopwords.contains(i)))
           .toList();
+      searchWords.add(link
+          .toLowerCase()
+          .toUpperCase()
+          .toLowerCase()); //add the link to search terms
       List<String> searchTerms = [];
       for (int i = 0; i < searchWords.length; ++i) {
         for (int j = 3; j <= searchWords[i].length; ++j) {
@@ -252,6 +265,7 @@ class Record {
               'image_ref': imageURL,
               'searchable': searchable,
               'author': author,
+              'link': link,
             }).then((onValue) {
               uploaded = true;
             }).catchError((onError) {});

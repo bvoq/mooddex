@@ -13,6 +13,8 @@ class SplashPage extends StatefulWidget {
 }
 
 class _SplashPageState extends State<SplashPage> {
+  bool success = true;
+
   @override
   initState() {
     FirebaseAuth.instance.currentUser().then((currentUser) {
@@ -31,20 +33,39 @@ class _SplashPageState extends State<SplashPage> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => MoodHome())))
-                          .catchError((err) => debugPrint(err));
+                          .catchError((err) => setState(() {
+                                success = false;
+                              }));
                     })));
       } else {
-        globalState.setUser(currentUser).then((val) {
-          Firestore.instance
-              .collection("users")
-              .document(currentUser.uid)
-              .get()
-              .then((DocumentSnapshot result) => Navigator.pushReplacement(
-                  context, MaterialPageRoute(builder: (context) => MoodHome())))
-              .catchError((err) => debugPrint(err));
+        globalState.setUser(currentUser).then((success) {
+          if (success) {
+            Firestore.instance
+                .collection("users")
+                .document(currentUser.uid)
+                .get()
+                .then((DocumentSnapshot result) => Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => MoodHome())))
+                .catchError((err) => setState(() {
+                      success = false;
+                    }));
+          } else {
+            setState(() {
+              success = false;
+            });
+          }
+        }).catchError((error) {
+          setState(() {
+            success = false;
+          });
         });
       }
-    }).catchError((err) => debugPrint(err));
+    }).catchError((err) {
+      setState(() {
+        success = false;
+      });
+    });
     super.initState();
   }
 
@@ -53,7 +74,10 @@ class _SplashPageState extends State<SplashPage> {
     return Scaffold(
       body: Center(
         child: Container(
-          child: Text("Loading..."),
+          child: success
+              ? Text("Loading...")
+              : Text("Failed connecting to the server.",
+                  style: TextStyle(color: Colors.black)),
         ),
       ),
     );

@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'globalState.dart';
 import 'guide.dart';
@@ -35,7 +36,7 @@ class MoodHeader extends SliverPersistentHeaderDelegate {
                       style: TextStyle(color: Colors.grey)));
             } else {
               return Image.file(File(record.image),
-                  width: size.width, height: 400, fit: BoxFit.cover);
+                  width: size.width, height: 300, fit: BoxFit.cover);
             }
           } else {
             return Center(child: CircularProgressIndicator());
@@ -53,7 +54,7 @@ class MoodHeader extends SliverPersistentHeaderDelegate {
   bool shouldRebuild(SliverPersistentHeaderDelegate _) => true;
 
   @override
-  double get maxExtent => 400; //modify for tablet!! 480
+  double get maxExtent => 300; //modify for tablet!! 480
 
   @override
   double get minExtent => 0;
@@ -93,12 +94,13 @@ class MoodTitle extends SliverPersistentHeaderDelegate {
                     ),
                   ),
                 ),
-                Text(
-                  'Kandersteg, Switzerland',
-                  style: TextStyle(
-                    color: Colors.grey,
-                  ),
-                ),
+                record.link.length > 0
+                    ? InkWell(
+                        child: Text(record.link.length > 60
+                            ? record.link.substring(0, 60) + "..."
+                            : record.link),
+                        onTap: () => launch(record.link))
+                    : Container(),
               ],
             ),
           ),
@@ -143,10 +145,10 @@ class MoodTitle extends SliverPersistentHeaderDelegate {
   bool shouldRebuild(SliverPersistentHeaderDelegate _) => true;
 
   @override
-  double get maxExtent => 108.0;
+  double get maxExtent => 108.0 + (record.link.length > 0 ? 37 : 0);
 
   @override
-  double get minExtent => 108.0;
+  double get minExtent => 108.0 + (record.link.length > 0 ? 37 : 0);
 }
 
 class MoodButtons extends SliverPersistentHeaderDelegate {

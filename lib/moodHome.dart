@@ -76,61 +76,117 @@ class MyMoodsState extends State<MyMoods> {
       header: Container(
         color: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.98),
         child: DataTable(
-          sortColumnIndex: currentSortedIndex,
-          sortAscending: sortingOrders[currentSortedIndex] >= 0,
-          columns: [
-            DataColumn(
-              label: Text("Name"),
-              onSort: (columnIndex, sortAscending) =>
-                  loadMyMoods(columnIndex, false),
-            ),
-            DataColumn(
-              label: Text("Category"),
-              onSort: (columnIndex, sortAscending) =>
-                  loadMyMoods(columnIndex, false),
-              numeric: true,
-            ),
-            DataColumn(
-                label: Text("Rating"),
+            sortColumnIndex: currentSortedIndex,
+            sortAscending: sortingOrders[currentSortedIndex] >= 0,
+            columnSpacing: 12,
+            horizontalMargin: 24,
+            columns: [
+              DataColumn(
+                label: Container(
+                  width: (MediaQuery.of(context).size.width - 6 * 24) * 0.63,
+                  child: Text("Name"),
+                ),
                 onSort: (columnIndex, sortAscending) =>
                     loadMyMoods(columnIndex, false),
-                numeric: true),
-          ],
-          rows: [],
-        ),
+                numeric: false,
+              ),
+              DataColumn(
+                label: Container(
+                  width: (MediaQuery.of(context).size.width - 6 * 24) * 0.22,
+                  child: Text("Category"),
+                ),
+                onSort: (columnIndex, sortAscending) =>
+                    loadMyMoods(columnIndex, false),
+                numeric: false,
+              ),
+              DataColumn(
+                  label: Container(
+                    width: (MediaQuery.of(context).size.width - 6 * 24) * 0.15,
+                    child: Text("Rating"),
+                  ),
+                  onSort: (columnIndex, sortAscending) =>
+                      loadMyMoods(columnIndex, false),
+                  numeric: true),
+            ],
+            rows: [] /*
+            DataRow(
+              cells: [
+                DataCell(
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.33333,
+                    child: Text(""),
+                  ),
+                ),
+                DataCell(Text("I do this")),
+                DataCell(
+                  Text("NaN"),
+                ),
+              ],
+            ),
+          ],*/
+            ),
       ),
       sliver: SliverToBoxAdapter(
         child: Container(
           child: DataTable(
+            columnSpacing: 12,
+            horizontalMargin: 24,
             columns: [
               DataColumn(
-                label: Container(),
+                label: Container(
+                  width: (MediaQuery.of(context).size.width - 6 * 24) * 0.63,
+                  child: Text("Name"),
+                ),
               ),
               DataColumn(
-                label: Container(),
-                numeric: true,
+                label: Container(
+                  width: (MediaQuery.of(context).size.width - 6 * 24) * 0.22,
+                  child: Text("Category"),
+                ),
+                numeric: false,
               ),
-              DataColumn(label: Container(), numeric: true),
+              DataColumn(
+                  label: Container(
+                    width: (MediaQuery.of(context).size.width - 6 * 24) * 0.15,
+                    child: Text("Rating"),
+                  ),
+                  numeric: true),
             ],
             rows: records
                 .map(
                   (recordUser) => DataRow(
                     cells: [
-                      DataCell(Text(recordUser.name),
+                      DataCell(
+                          Container(
+                            width:
+                                (MediaQuery.of(context).size.width - 6 * 24) *
+                                    0.63,
+                            child: Text(recordUser.name),
+                          ),
                           onTap: () => tappedOnMood(recordUser)),
                       DataCell(
-                          Text(recordUser.category == 0
-                              ? "I do this"
-                              : recordUser.category == 1
-                                  ? "I did this"
-                                  : recordUser.category == 2
-                                      ? "I will do this"
-                                      : ""),
+                          Container(
+                            width:
+                                (MediaQuery.of(context).size.width - 6 * 24) *
+                                    0.22,
+                            child: Text(recordUser.category == 0
+                                ? "I do this"
+                                : recordUser.category == 1
+                                    ? "I did this"
+                                    : recordUser.category == 2
+                                        ? "I will do this"
+                                        : ""),
+                          ),
                           onTap: () => tappedOnMood(recordUser)),
                       DataCell(
-                          Text(recordUser.rating == 0
-                              ? "Unrated"
-                              : recordUser.rating.toString()),
+                          Container(
+                            width:
+                                (MediaQuery.of(context).size.width - 6 * 24) *
+                                    0.15,
+                            child: Text(recordUser.rating == 0
+                                ? "NaN"
+                                : recordUser.rating.toString()),
+                          ),
                           placeholder: recordUser.rating == 0,
                           onTap: () => tappedOnMood(recordUser)),
                     ],

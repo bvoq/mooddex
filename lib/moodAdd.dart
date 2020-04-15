@@ -52,12 +52,14 @@ class MoodAddState extends State<MoodAdd> {
   void publishWidgetAndUpdateScreen(BuildContext context) {
     if (_imageFile != null) {
       debugPrint('Publishing the mood ' + _nameController.text);
+
       Record r = Record.fromInitializer(
-          _nameController.text,
-          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-          _imageFile,
-          searchable == 0,
-          globalState.getUser().uid);
+          name: _nameController.text,
+          votes: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+          imageFileToBeUploaded: _imageFile,
+          searchable: (searchable == 0),
+          author: globalState.getUser().uid,
+          link: _linkController.text);
       Future<void> success = r.publish();
 
       success.then((value) {
@@ -122,7 +124,7 @@ class MoodAddState extends State<MoodAdd> {
                       labelText: 'Link (optional)', hintText: 'https://...'),
                   controller: _linkController,
                   obscureText: false,
-                  maxLength: 45,
+                  maxLength: 200,
                   validator: _linkValidator,
                 )),
             Padding(

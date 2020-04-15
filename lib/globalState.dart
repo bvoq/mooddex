@@ -94,27 +94,34 @@ class GlobalState {
     return;
   }
 
-  Future<void> setUser(FirebaseUser newUser) async {
+  Future<bool> setUser(FirebaseUser newUser) async {
     user = newUser;
     userReference =
         Firestore.instance.collection("users").document(newUser.uid);
 
-    DocumentSnapshot ds = await userReference.get();
+    DocumentSnapshot ds = await userReference.get().catchError((onError) {
+      return false;
+    });
 
     assert(ds.data["globalState"] != null);
 
     globalStateIndex = ds.data["globalState"];
     if (ds.data["username"] != null) userName = ds.data["username"];
 
-    QuerySnapshot snap =
-        await userReference.collection("mymoods").limit(10000).getDocuments();
+    QuerySnapshot snap = await userReference
+        .collection("mymoods")
+        .limit(10000)
+        .getDocuments()
+        .catchError((onError) {
+      return false;
+    });
     List<DocumentSnapshot> snaps = snap.documents;
     for (int i = 0; i < snaps.length; ++i) {
       RecordUser userRecord = RecordUser.fromSnapshot(snaps[i]);
       userRecords[userRecord.collectionName] = userRecord;
     }
 
-    return;
+    return true;
   }
 
   FirebaseUser getUser() {
