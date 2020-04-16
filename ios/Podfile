@@ -92,3 +92,7 @@ end
 
 # Google sign-in
 # pod 'GoogleSignIn'
+
+# Analytics and deep links
+pod 'Firebase/Analytics'
+pod 'Firebase/DynamicLinks'

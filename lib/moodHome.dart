@@ -10,6 +10,7 @@ import 'globalState.dart';
 import 'login.dart';
 import 'record.dart';
 import 'register.dart';
+import 'dynamicLinks.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
@@ -30,6 +31,12 @@ class MyMoodsState extends State<MyMoods> {
       loadMyMoods(currentSortedIndex, false);
       return;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    initDynamicLinks(context);
   }
 
   void loadMyMoods(int index, bool constructor) {
@@ -53,20 +60,6 @@ class MyMoodsState extends State<MyMoods> {
     });
 
     if (!constructor) setState(() => {}); //call build function again.
-  }
-
-  void tappedOnMood(RecordUser recordUser) {
-    DocumentReference dr = Firestore.instance
-        .collection('moods')
-        .document(recordUser.collectionName);
-    dr.get().then((DocumentSnapshot snapshot) {
-      Record record = Record.fromSnapshot(snapshot);
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => MoodDetail(initialRecord: record),
-          ));
-    });
   }
 
   @override
@@ -135,20 +128,17 @@ class MyMoodsState extends State<MyMoods> {
               DataColumn(
                 label: Container(
                   width: (MediaQuery.of(context).size.width - 6 * 24) * 0.63,
-                  child: Text("Name"),
                 ),
               ),
               DataColumn(
                 label: Container(
                   width: (MediaQuery.of(context).size.width - 6 * 24) * 0.22,
-                  child: Text("Category"),
                 ),
                 numeric: false,
               ),
               DataColumn(
                   label: Container(
                     width: (MediaQuery.of(context).size.width - 6 * 24) * 0.15,
-                    child: Text("Rating"),
                   ),
                   numeric: true),
             ],
@@ -163,7 +153,8 @@ class MyMoodsState extends State<MyMoods> {
                                     0.63,
                             child: Text(recordUser.name),
                           ),
-                          onTap: () => tappedOnMood(recordUser)),
+                          onTap: () =>
+                              tappedOnMood(context, recordUser.collectionName)),
                       DataCell(
                           Container(
                             width:
@@ -177,7 +168,8 @@ class MyMoodsState extends State<MyMoods> {
                                         ? "I will do this"
                                         : ""),
                           ),
-                          onTap: () => tappedOnMood(recordUser)),
+                          onTap: () =>
+                              tappedOnMood(context, recordUser.collectionName)),
                       DataCell(
                           Container(
                             width:
@@ -188,7 +180,8 @@ class MyMoodsState extends State<MyMoods> {
                                 : recordUser.rating.toString()),
                           ),
                           placeholder: recordUser.rating == 0,
-                          onTap: () => tappedOnMood(recordUser)),
+                          onTap: () =>
+                              tappedOnMood(context, recordUser.collectionName)),
                     ],
                   ),
                 )

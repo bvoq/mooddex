@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:mooddex_client/dynamicLinks.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'globalState.dart';
@@ -12,6 +13,20 @@ import 'record.dart';
 import 'moodRate.dart';
 import 'moodGuide.dart';
 import 'moodReport.dart';
+
+void tappedOnMood(BuildContext context, String collectionName) {
+  debugPrint("loading mood " + collectionName);
+  DocumentReference dr =
+      Firestore.instance.collection('moods').document(collectionName);
+  dr.get().then((DocumentSnapshot snapshot) {
+    Record record = Record.fromSnapshot(snapshot);
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MoodDetail(initialRecord: record),
+        ));
+  });
+}
 
 class MoodHeader extends SliverPersistentHeaderDelegate {
   final Record record;
@@ -145,10 +160,10 @@ class MoodTitle extends SliverPersistentHeaderDelegate {
   bool shouldRebuild(SliverPersistentHeaderDelegate _) => true;
 
   @override
-  double get maxExtent => 108.0 + (record.link.length > 0 ? 37 : 0);
+  double get maxExtent => 109.0 + (record.link.length > 0 ? 38 : 0);
 
   @override
-  double get minExtent => 108.0 + (record.link.length > 0 ? 37 : 0);
+  double get minExtent => 109.0 + (record.link.length > 0 ? 38 : 0);
 }
 
 class MoodButtons extends SliverPersistentHeaderDelegate {
@@ -225,7 +240,9 @@ class MoodButtons extends SliverPersistentHeaderDelegate {
                     record: record, callbackMoodDetail: callbackMoodDetail));
           }),
           _buildButtonColumn(
-              Theme.of(context).accentColor, Icons.share, 'SHARE', () {}),
+              Theme.of(context).accentColor, Icons.share, 'SHARE', () async {
+            await shareMood(record);
+          }),
         ],
       ),
     );

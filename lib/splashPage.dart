@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'login.dart';
 import 'moodHome.dart';
 import 'globalState.dart';
+import 'dynamicLinks.dart';
 
 class SplashPage extends StatefulWidget {
   SplashPage({Key key}) : super(key: key);

@@ -130,7 +130,7 @@ class _LoginPageState extends State<LoginPage> {
                             //    .get();
                             FirebaseUser u =
                                 await FirebaseAuth.instance.currentUser();
-                            globalState.setUser(u);
+                            await globalState.setUser(u);
                             debugPrint("Hopefully not null: " + u.email);
                             Navigator.pop(context);
                             Navigator.pushReplacement(
