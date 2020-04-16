@@ -15,7 +15,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
-import 'login.dart';
 import 'splashPage.dart';
 
 void main() => runApp(MyApp());

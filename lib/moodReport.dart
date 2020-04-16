@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'globalState.dart';
-import 'record.dart';
-
 class MoodReport extends StatefulWidget {
   final String reportType;
   final String reportLocation;
@@ -69,7 +66,7 @@ class MoodReportState extends State<MoodReport> {
                 scrollDirection: Axis.vertical,
                 child: ConstrainedBox(
                   constraints: new BoxConstraints(
-                    maxHeight: MediaQuery.of(context).size.height * 0.4,
+                    maxHeight: MediaQuery.of(context).size.height * 0.3,
                   ),
                   child: TextField(
                     style: TextStyle(fontSize: 14),
@@ -94,10 +91,10 @@ class MoodReportState extends State<MoodReport> {
               ),
             ),
             Padding(
-                padding: const EdgeInsets.only(left: 3, top: 48, bottom: 0),
+                padding: const EdgeInsets.only(left: 3, top: 8, bottom: 0),
                 child: CupertinoDialogAction(
                   isDefaultAction: true,
-                  child: Text("Create " + widget.reportType),
+                  child: Text("Create feedback"),
                   onPressed: () async {
                     await Firestore.instance.collection("reports").add({
                       "rt": widget.reportType,

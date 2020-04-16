@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -8,11 +6,9 @@ import 'moodDetail.dart';
 import 'moodReport.dart';
 import 'globalState.dart';
 import 'login.dart';
-import 'record.dart';
 import 'register.dart';
 import 'dynamicLinks.dart';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 
 class MyMoods extends StatefulWidget {

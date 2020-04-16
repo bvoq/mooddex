@@ -1,16 +1,11 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
-import 'package:mooddex_client/moodDetail.dart';
-
-import 'guide.dart';
-import 'moodHome.dart';
-import 'record.dart';
-
 import 'dart:core';
 
+import 'package:flutter/material.dart';
+import 'package:mooddex_client/moodDetail.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:share/share.dart';
+
+import 'record.dart';
 
 Future<Uri> createDynamicLink(Record record) async {
   Uri imageURI = Uri.parse(record.imageURL);
@@ -44,7 +39,8 @@ Future<Uri> createDynamicLink(Record record) async {
           record.added.toString() +
           " user" +
           (record.added > 0 ? "s" : "") +
-          "!",
+          "!\n" +
+          record.link,
       imageUrl: imageURI,
     ),
   );
@@ -55,9 +51,10 @@ Future<Uri> createDynamicLink(Record record) async {
   return shortUrl;
 }
 
-void shareMood(Record record) async {
+Future<void> shareMood(Record record) async {
   Uri urlToShare = await createDynamicLink(record);
   Share.share(urlToShare.toString());
+  return;
 }
 
 void initDynamicLinks(BuildContext context) async {

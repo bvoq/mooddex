@@ -82,58 +82,92 @@ class MoodTitle extends SliverPersistentHeaderDelegate {
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Container(
-      padding: const EdgeInsets.all(32),
-      decoration: new BoxDecoration(
-        border: new Border.all(
-            color: Colors
-                .transparent), //color is transparent so that it does not blend with the actual color specified
-        borderRadius: const BorderRadius.all(const Radius.circular(30.0)),
-        color: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.95),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            /*An expanded widget expands the column to fit the full size.*/
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                /*2 Creating a container here instead of a Text allows us to add padding!*/
+    return GestureDetector(
+      onLongPress: () async {
+        return showCupertinoModalPopup<void>(
+          context: context,
+          builder: (BuildContext context) {
+            return CupertinoActionSheet(
+              title: Text('Select option'),
+              message: Text('Choose an action.'),
+              actions: <Widget>[
+                CupertinoActionSheetAction(
+                  child: Text('Report'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) => MoodReport(
+                            reportType: "mood",
+                            reportLocation: record.reference.documentID,
+                            reportDescription:
+                                "What about this mood constitutes an App Store violation?\n"));
+                  },
+                ),
+              ],
+              cancelButton: CupertinoActionSheetAction(
+                isDefaultAction: true,
+                child: Text('Cancel'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            );
+          },
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.all(32),
+        decoration: new BoxDecoration(
+          border: new Border.all(
+              color: Colors
+                  .transparent), //color is transparent so that it does not blend with the actual color specified
+          borderRadius: const BorderRadius.all(const Radius.circular(30.0)),
+          color: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.95),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              /*An expanded widget expands the column to fit the full size.*/
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  /*2 Creating a container here instead of a Text allows us to add padding!*/
 
-                Container(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: Text(
-                    record.name,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
+                  Container(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Text(
+                      record.name,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ),
-                record.link.length > 0
-                    ? InkWell(
-                        child: Text(record.link.length > 60
-                            ? record.link.substring(0, 60) + "..."
-                            : record.link),
-                        onTap: () => launch(record.link))
-                    : Container(),
-              ],
+                  record.link.length > 0
+                      ? InkWell(
+                          child: Text(record.link.length > 60
+                              ? record.link.substring(0, 60) + "..."
+                              : record.link),
+                          onTap: () => launch(record.link))
+                      : Container(),
+                ],
+              ),
             ),
-          ),
-          /*3 all part of the same row, sample icon */
-          Icon(
-            Icons.people,
-            color: Theme.of(context).accentColor,
-          ),
-          Text(" " + record.added.toString(),
-              style: TextStyle(color: Theme.of(context).accentColor)),
-          Padding(padding: EdgeInsets.only(right: 10)),
-          Icon(
-            Icons.star,
-            color: Theme.of(context).accentColor,
-          ),
-          Text(record.unweightedScore.toStringAsFixed(1),
-              style: TextStyle(color: Theme.of(context).accentColor)),
-          /*
+            /*3 all part of the same row, sample icon */
+            Icon(
+              Icons.people,
+              color: Theme.of(context).accentColor,
+            ),
+            Text(" " + record.added.toString(),
+                style: TextStyle(color: Theme.of(context).accentColor)),
+            Padding(padding: EdgeInsets.only(right: 10)),
+            Icon(
+              Icons.star,
+              color: Theme.of(context).accentColor,
+            ),
+            Text(record.unweightedScore.toStringAsFixed(1),
+                style: TextStyle(color: Theme.of(context).accentColor)),
+            /*
           Column(children: [
             Row(
               children: [
@@ -151,7 +185,8 @@ class MoodTitle extends SliverPersistentHeaderDelegate {
             ),
           ]),
           */
-        ],
+          ],
+        ),
       ),
     );
   }

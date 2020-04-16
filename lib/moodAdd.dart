@@ -98,11 +98,7 @@ class MoodAddState extends State<MoodAdd> {
         child: Column(
           children: [
             CupertinoNavigationBar(middle: Text("Add mood")),
-            _imageChooser,
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            ),
+
             Padding(
                 padding:
                     const EdgeInsets.only(left: 16.0, right: 16.0, top: 8.0),
@@ -127,6 +123,11 @@ class MoodAddState extends State<MoodAdd> {
                   maxLength: 200,
                   validator: _linkValidator,
                 )),
+            _imageChooser,
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            ),
             Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),

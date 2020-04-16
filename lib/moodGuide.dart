@@ -55,40 +55,23 @@ class MoodGuideState extends State<MoodGuide> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
+              /*
               Padding(
-                padding: const EdgeInsets.only(left: 0, bottom: 24),
-                child: Text(widget.record.name,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    )),
-              ),
+                  padding: const EdgeInsets.only(left: 3, bottom: 6),
+                  child: Text(
+                    "Some tips for writing a good guide:",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  )),*/
               Padding(
                 padding: const EdgeInsets.only(left: 3, bottom: 6),
-                child: Text(
-                    "Some tips for writing a good guide:\n\n• Describe in 1-3 sentences what \n   " +
-                        widget
-                            .record.name
-                            .toLowerCase()
-                            .toUpperCase()
-                            .toLowerCase() +
-                        " is.\n• Share how best to experience\n   " +
-                        widget
-                            .record.name
-                            .toLowerCase()
-                            .toUpperCase()
-                            .toLowerCase() +
-                        ".\n• " +
-                        (rating >
-                                0
-                            ? "Justify your rating of " +
-                                rating.toString() +
-                                " (pros/cons)."
-                            : "Justify the pros/cons of \n   " +
-                                widget.record.name
-                                    .toLowerCase()
-                                    .toUpperCase()
-                                    .toLowerCase() +
-                                ".\n")),
+                child: Text("Some tips for writing a good guide:\n\n" +
+                    "• Describe the mood in 1-3 sentences.\n" +
+                    "• Then share how to best experience it.\n" +
+                    (rating > 0
+                        ? "• Justify your rating of " +
+                            rating.toString() +
+                            " (pros/cons)."
+                        : "• Justify the pros and cons the mood.")),
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 3, top: 16, bottom: 8),
@@ -96,7 +79,7 @@ class MoodGuideState extends State<MoodGuide> {
                   scrollDirection: Axis.vertical,
                   child: ConstrainedBox(
                     constraints: new BoxConstraints(
-                      maxHeight: MediaQuery.of(context).size.height * 0.4,
+                      maxHeight: MediaQuery.of(context).size.height * 0.3,
                     ),
                     child: TextField(
                       style: TextStyle(fontSize: 14),
@@ -121,7 +104,7 @@ class MoodGuideState extends State<MoodGuide> {
                 ),
               ),
               Padding(
-                  padding: const EdgeInsets.only(left: 3, top: 48, bottom: 0),
+                  padding: const EdgeInsets.only(left: 3, top: 0, bottom: 0),
                   child: CupertinoDialogAction(
                     isDefaultAction: true,
                     child: new Text(globalState.userRecords

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'globalState.dart';
 import 'moodHome.dart';
@@ -178,7 +177,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           debugPrint("register error: " + error.toString());
                         }
 
-/* TODO *async message for no internet connection*
+/*  *async message for no internet connection*
       try {
         final result = await InternetAddress.lookup('google.com');
         if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
