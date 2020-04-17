@@ -7,9 +7,7 @@ import 'record.dart';
 
 class MoodRate extends StatefulWidget {
   final Record record;
-  final Function callbackMoodDetail;
-  MoodRate({Key key, @required this.record, @required this.callbackMoodDetail})
-      : super(key: key);
+  MoodRate({Key key, @required this.record}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => MoodRateState(record.collectionName);
@@ -54,84 +52,99 @@ class MoodRateState extends State<MoodRate> {
           ],
         ),
         child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 0, bottom: 24),
-                child: Text(widget.record.name,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    )),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 3, bottom: 6),
-                child: Text("Rate:"),
-              ),
-              Row(children: [
-                Expanded(
-                  child: SmoothStarRating(
-                      allowHalfRating: false,
-                      onRatingChanged: (v) {
-                        _ratingForStars = v;
-                        rating = _ratingForStars.ceil();
-                        setState(() {});
-                      },
-                      starCount: 10,
-                      rating: _ratingForStars,
-                      size: 25.0,
-                      filledIconData: Icons.star,
-                      color: rating == 0 ? Colors.grey : Colors.green,
-                      borderColor: rating == 0 ? Colors.grey : Colors.green,
-                      spacing: 0.0),
-                ),
-                Text(rating == 0 ? "NaN" : rating.toString(),
-                    style: TextStyle(
-                        color: rating == 0 ? Colors.grey : Colors.green))
-              ]),
-              Padding(
-                padding: const EdgeInsets.only(left: 3, top: 16, bottom: 8),
-                child: Text("Category:"),
-              ),
-              CupertinoSlidingSegmentedControl(
-                  groupValue: category,
-                  children: const <int, Widget>{
-                    0: Padding(
-                        padding: const EdgeInsets.only(left: 6, right: 6),
-                        child: Text("I do this")),
-                    1: Padding(
-                        padding: const EdgeInsets.only(left: 6, right: 6),
-                        child: Text("I did this")),
-                    2: Padding(
-                        padding: const EdgeInsets.only(left: 6, right: 6),
-                        child: Text("I will do this")),
-                  },
-                  onValueChanged: (i) {
-                    setState(() {
-                      category = i;
-                    });
-                  }),
-              Padding(
-                  padding: const EdgeInsets.only(left: 3, top: 48, bottom: 0),
-                  child: CupertinoDialogAction(
-                    isDefaultAction: true,
-                    child: globalState.userRecords
-                            .containsKey(widget.record.collectionName)
-                        ? Text("Change rating")
-                        : Text("Add mood"),
-                    onPressed: () {
-                      assert(widget.record != null);
-                      debugPrint(
-                          "adding mood: " + widget.record.collectionName);
-                      Navigator.of(context).pop();
-                      globalState
-                          .addRating(widget.record, rating, category)
-                          .then((newRecord) {
-                        widget.callbackMoodDetail(newRecord);
-                      });
-                    },
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 0, bottom: 24),
+              child: Text(widget.record.name,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
                   )),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 3, bottom: 6),
+              child: Text("Rate:"),
+            ),
+            Row(children: [
+              Expanded(
+                child: SmoothStarRating(
+                    allowHalfRating: false,
+                    onRatingChanged: (v) {
+                      _ratingForStars = v;
+                      rating = _ratingForStars.ceil();
+                      setState(() {});
+                    },
+                    starCount: 10,
+                    rating: _ratingForStars,
+                    size: 25.0,
+                    filledIconData: Icons.star,
+                    color: rating == 0 ? Colors.grey : Colors.green,
+                    borderColor: rating == 0 ? Colors.grey : Colors.green,
+                    spacing: 0.0),
+              ),
+              Text(rating == 0 ? "NaN" : rating.toString(),
+                  style: TextStyle(
+                      color: rating == 0 ? Colors.grey : Colors.green))
             ]),
+            Padding(
+              padding: const EdgeInsets.only(left: 3, top: 16, bottom: 8),
+              child: Text("Category:"),
+            ),
+            CupertinoSlidingSegmentedControl(
+                groupValue: category,
+                children: const <int, Widget>{
+                  0: Padding(
+                      padding: const EdgeInsets.only(left: 6, right: 6),
+                      child: Text("I do this")),
+                  1: Padding(
+                      padding: const EdgeInsets.only(left: 6, right: 6),
+                      child: Text("I did this")),
+                  2: Padding(
+                      padding: const EdgeInsets.only(left: 6, right: 6),
+                      child: Text("I will do this")),
+                },
+                onValueChanged: (i) {
+                  setState(() {
+                    category = i;
+                  });
+                }),
+            Padding(
+              padding: const EdgeInsets.only(left: 3, top: 48, bottom: 0),
+              child: CupertinoDialogAction(
+                isDefaultAction: true,
+                child: globalState.userRecords
+                        .containsKey(widget.record.collectionName)
+                    ? Text("Change rating")
+                    : Text("Add mood"),
+                onPressed: () {
+                  assert(widget.record != null);
+                  debugPrint("adding mood: " + widget.record.collectionName);
+                  Navigator.of(context).pop();
+                  globalState
+                      .addRating(widget.record, rating, category)
+                      .then((newRecord) {
+                    //widget.callbackMoodDetail(newRecord);
+                  });
+                },
+              ),
+            ),
+            globalState.userRecords.containsKey(widget.record.collectionName)
+                ? Padding(
+                    padding: const EdgeInsets.only(left: 3, top: 8, bottom: 0),
+                    child: CupertinoDialogAction(
+                      isDefaultAction: false,
+                      child: Text("Remove mood",
+                          style: TextStyle(color: Colors.red)),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        globalState.removeRating(widget.record);
+                      },
+                    ),
+                  )
+                : Container(),
+          ],
+        ),
       ),
     );
   }

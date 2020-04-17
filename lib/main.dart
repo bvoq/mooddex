@@ -50,7 +50,7 @@ class MyApp extends StatelessWidget {
           //primaryColor: Color(0x003c7e00),
           accentColor: Colors.deepOrange),
       */
-      debugShowCheckedModeBanner: true,
+      debugShowCheckedModeBanner: false,
     );
   }
 }

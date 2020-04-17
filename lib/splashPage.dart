@@ -21,9 +21,11 @@ class _SplashPageState extends State<SplashPage> {
   initState() {
     FirebaseAuth.instance.currentUser().then((currentUser) {
       if (currentUser != null) {
+        debugPrint("not null");
         neverSignedIn = false;
         setState(() {});
         globalState.setUser(currentUser).then((glsuccess) {
+          debugPrint("setuserstate: " + glsuccess.toString());
           if (glsuccess) {
             Firestore.instance
                 .collection("users")
@@ -48,6 +50,9 @@ class _SplashPageState extends State<SplashPage> {
         });
       } else {
         neverSignedIn = true;
+        setState(() {
+          neverSignedIn = true;
+        });
       }
     }).catchError((err) {
       setState(() {
@@ -101,28 +106,32 @@ class _SplashPageState extends State<SplashPage> {
                       left: MediaQuery.of(context).size.width * 0.5,
                       child: CupertinoButton(
                           child: Text("Get Started"),
-                          onPressed: () {
+                          onPressed: () async {
                             //create an anonymous user
+                            debugPrint("ok user");
                             FirebaseAuth.instance.signInAnonymously().then(
                                 (AuthResult res) => globalState
-                                    .registerUser(res.user, "anonymous", "")
-                                    .then((val) => globalState
-                                            .setUser(res.user)
-                                            .then((val) {
-                                          Firestore.instance
-                                              .collection("users")
-                                              .document(res.user.uid)
-                                              .get()
-                                              .then((DocumentSnapshot result) =>
-                                                  Navigator.pushReplacement(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              MoodHome())))
-                                              .catchError((err) => setState(() {
-                                                    success = false;
-                                                  }));
-                                        })));
+                                        .registerUser(res.user, "anonymous", "")
+                                        .then((val) {
+                                      debugPrint("registered user");
+                                      globalState.setUser(res.user).then((val) {
+                                        debugPrint("set user");
+                                        Firestore.instance
+                                            .collection("users")
+                                            .document(res.user.uid)
+                                            .get()
+                                            .then((DocumentSnapshot result) {
+                                          debugPrint("final get request");
+                                          Navigator.pushReplacement(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      MoodHome()));
+                                        }).catchError((err) => setState(() {
+                                                  success = false;
+                                                }));
+                                      });
+                                    }));
                           }),
                     ),
                   ],
@@ -133,6 +142,7 @@ class _SplashPageState extends State<SplashPage> {
         ),
       );
     } else {
+      debugPrint("Heyo building");
       return Scaffold(
         body: Stack(
           children: <Widget>[

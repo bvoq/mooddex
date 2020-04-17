@@ -202,9 +202,12 @@ class Record {
 
     StorageReference ref =
         storage.ref().child("images").child(collectionName + "." + extension);
+
     StorageUploadTask uploadTask = ref.putFile(imageFileToBeUploaded);
 
     String dowurl = await (await uploadTask.onComplete).ref.getDownloadURL();
+
+    debugPrint("finished uploading image");
     imageURL = dowurl;
   }
 
@@ -248,6 +251,7 @@ class Record {
         //first upload the image, then upload the firestore instance.
         await _uploadImage().then((onValue) async {
           if (imageURL.length > 0) {
+            debugPrint("time to upload " + author);
             await _reference.setData({
               'name': name,
               'search_terms': searchTerms,
@@ -266,7 +270,9 @@ class Record {
               'searchable': searchable,
               'author': author,
               'link': link,
+              'location': "",
             }).then((onValue) {
+              debugPrint("final set data");
               uploaded = true;
             }).catchError((onError) {});
           }

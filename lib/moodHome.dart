@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'moodSearch.dart';
 import 'moodDetail.dart';
 import 'moodReport.dart';
 import 'globalState.dart';
 import 'login.dart';
+import 'record.dart';
 import 'register.dart';
 import 'dynamicLinks.dart';
 
@@ -23,7 +25,7 @@ class MyMoodsState extends State<MyMoods> {
 
   MyMoodsState() {
     loadMyMoods(2, true);
-    globalState.addUpdateFunction(() {
+    globalState.addUpdateFunction((Record record) {
       loadMyMoods(currentSortedIndex, false);
       return;
     });
@@ -120,6 +122,7 @@ class MyMoodsState extends State<MyMoods> {
           child: DataTable(
             columnSpacing: 12,
             horizontalMargin: 24,
+            dataRowHeight: 48,
             columns: [
               DataColumn(
                 label: Container(
@@ -143,19 +146,23 @@ class MyMoodsState extends State<MyMoods> {
                   (recordUser) => DataRow(
                     cells: [
                       DataCell(
-                          Container(
-                            width:
-                                (MediaQuery.of(context).size.width - 6 * 24) *
-                                    0.63,
-                            child: Text(recordUser.name),
-                          ),
-                          onTap: () =>
-                              tappedOnMood(context, recordUser.collectionName)),
+                        Container(
+                          alignment: Alignment.centerLeft,
+                          width: (MediaQuery.of(context).size.width - 6 * 24) *
+                              0.63,
+                          height: 48,
+                          child: Text(recordUser.name),
+                        ),
+                        onTap: () =>
+                            tappedOnMood(context, recordUser.collectionName),
+                      ),
                       DataCell(
                           Container(
+                            alignment: Alignment.centerLeft,
                             width:
                                 (MediaQuery.of(context).size.width - 6 * 24) *
                                     0.22,
+                            height: 48,
                             child: Text(recordUser.category == 0
                                 ? "I do this"
                                 : recordUser.category == 1
@@ -167,17 +174,19 @@ class MyMoodsState extends State<MyMoods> {
                           onTap: () =>
                               tappedOnMood(context, recordUser.collectionName)),
                       DataCell(
-                          Container(
+                        Container(
+                            alignment: Alignment.centerRight,
                             width:
                                 (MediaQuery.of(context).size.width - 6 * 24) *
                                     0.15,
+                            height: 48,
                             child: Text(recordUser.rating == 0
                                 ? "NaN"
-                                : recordUser.rating.toString()),
-                          ),
-                          placeholder: recordUser.rating == 0,
-                          onTap: () =>
-                              tappedOnMood(context, recordUser.collectionName)),
+                                : recordUser.rating.toString())),
+                        placeholder: recordUser.rating == 0,
+                        onTap: () =>
+                            tappedOnMood(context, recordUser.collectionName),
+                      ),
                     ],
                   ),
                 )

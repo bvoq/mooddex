@@ -91,6 +91,17 @@ class MoodTitle extends SliverPersistentHeaderDelegate {
               title: Text('Select option'),
               message: Text('Choose an action.'),
               actions: <Widget>[
+                globalState.userRecords.containsKey(record.collectionName)
+                    ? CupertinoDialogAction(
+                        isDefaultAction: true,
+                        child: Text("Remove mood"),
+                        onPressed: () async {
+                          globalState.removeRating(record).then((vo) {
+                            Navigator.of(context).pop();
+                          });
+                        },
+                      )
+                    : Container(),
                 CupertinoActionSheetAction(
                   child: Text('Report'),
                   onPressed: () {
@@ -203,10 +214,7 @@ class MoodTitle extends SliverPersistentHeaderDelegate {
 
 class MoodButtons extends SliverPersistentHeaderDelegate {
   final Record record;
-  final Function callbackMoodDetail;
-  MoodButtons(Record record, Function callbackMoodDetail)
-      : record = record,
-        callbackMoodDetail = callbackMoodDetail;
+  MoodButtons(Record record) : record = record;
 
   Column _buildButtonColumn(
           Color color, IconData icon, String label, Function onPress) =>
@@ -235,6 +243,43 @@ class MoodButtons extends SliverPersistentHeaderDelegate {
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
+    List<Widget> buttonWidgets = new List<Widget>();
+    buttonWidgets.add(_buildButtonColumn(
+        Theme.of(context).accentColor,
+        Icons.thumbs_up_down,
+        globalState.userRecords.containsKey(record.collectionName)
+            ? "EDIT RATING"
+            : "ADD MOOD",
+        () => showDialog(
+            context: context,
+            builder: (BuildContext context) => MoodRate(record: record))));
+    buttonWidgets.add(_buildButtonColumn(
+        Theme.of(context).accentColor,
+        Icons.rate_review,
+        globalState.userRecords.containsKey(record.collectionName) &&
+                globalState
+                        .userRecords[record.collectionName].guideText.length >
+                    0
+            ? 'EDIT GUIDE'
+            : 'WRITE GUIDE', () {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) => MoodGuide(record: record));
+    }));
+
+    /*
+    if (globalState.userRecords.containsKey(record.collectionName)) {
+      buttonWidgets.add(_buildButtonColumn(
+          Theme.of(context).accentColor, Icons.remove, 'REMOVE', () async {
+        globalState.removeRating(record).then((vo) {});
+      }));
+    }*/
+
+    buttonWidgets.add(_buildButtonColumn(
+        Theme.of(context).accentColor, Icons.share, 'SHARE', () async {
+      await shareMood(record);
+    }));
+
     return Container(
       padding: const EdgeInsets.only(top: 16, bottom: 40, left: 24, right: 24),
       decoration: new BoxDecoration(
@@ -247,38 +292,7 @@ class MoodButtons extends SliverPersistentHeaderDelegate {
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildButtonColumn(
-              Theme.of(context).accentColor,
-              Icons.thumbs_up_down,
-              globalState.userRecords.containsKey(record.collectionName)
-                  ? "EDIT RATING"
-                  : "ADD MOOD",
-              () => showDialog(
-                  context: context,
-                  builder: (BuildContext context) => MoodRate(
-                      record: record, callbackMoodDetail: callbackMoodDetail))),
-          //_buildButtonColumn(
-          //    Theme.of(context).accentColor, Icons.archive, 'TODO MOOD', () {}),
-          _buildButtonColumn(
-              Theme.of(context).accentColor,
-              Icons.rate_review,
-              globalState.userRecords.containsKey(record.collectionName) &&
-                      globalState.userRecords[record.collectionName].guideText
-                              .length >
-                          0
-                  ? 'EDIT GUIDE'
-                  : 'WRITE GUIDE', () {
-            showDialog(
-                context: context,
-                builder: (BuildContext context) => MoodGuide(
-                    record: record, callbackMoodDetail: callbackMoodDetail));
-          }),
-          _buildButtonColumn(
-              Theme.of(context).accentColor, Icons.share, 'SHARE', () async {
-            await shareMood(record);
-          }),
-        ],
+        children: buttonWidgets,
       ),
     );
   }
@@ -511,9 +525,10 @@ class MoodDetailState extends State<MoodDetail> {
     debugPrint(record.name);
     header = MoodHeader(record);
     title = MoodTitle(record);
-    buttons = MoodButtons(record, callbackMoodDetail);
+    buttons = MoodButtons(record);
     guides = MoodGuides(initialRecord: record);
     record = record;
+    globalState.addUpdateFunction(callbackMoodDetail);
   }
 
   void callbackMoodDetail(Record newRecord) {
@@ -522,7 +537,7 @@ class MoodDetailState extends State<MoodDetail> {
     record = newRecord;
     //header = MoodHeader(record);
     title = MoodTitle(record);
-    buttons = MoodButtons(record, callbackMoodDetail);
+    buttons = MoodButtons(record);
     guides = MoodGuides(initialRecord: record);
     setState(() => {});
   }

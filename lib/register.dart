@@ -126,12 +126,14 @@ class _RegisterPageState extends State<RegisterPage> {
                             globalState.user
                                 .linkWithCredential(credential)
                                 .then((authres) {
+                              debugPrint("authorized till here");
                               globalState
                                   .registerUser(
                                       authres.user,
                                       userNameInputController.text,
                                       emailInputController.text)
                                   .then((vo) {
+                                debugPrint("registered user");
                                 globalState.setUser(authres.user).then((vo) {
                                   Navigator.pushAndRemoveUntil(
                                       context,
@@ -153,13 +155,16 @@ class _RegisterPageState extends State<RegisterPage> {
                                 .catchError((error) => debugPrint(
                                     "create user error: " + error.toString()))
                                 .then((authres) {
+                              debugPrint("authorized user here");
                               globalState
                                   .registerUser(
                                       authres.user,
                                       userNameInputController.text,
                                       emailInputController.text)
                                   .then((result) {
+                                debugPrint("registered user here");
                                 globalState.setUser(authres.user).then((vo) {
+                                  debugPrint("set user till here");
                                   Navigator.pushAndRemoveUntil(
                                       context,
                                       MaterialPageRoute(

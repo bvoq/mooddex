@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'globalState.dart';
+
 class MoodReport extends StatefulWidget {
   final String reportType;
   final String reportLocation;
@@ -97,6 +99,7 @@ class MoodReportState extends State<MoodReport> {
                   child: Text("Create feedback"),
                   onPressed: () async {
                     await Firestore.instance.collection("reports").add({
+                      "au": globalState.userName,
                       "rt": widget.reportType,
                       "rl": widget.reportLocation,
                       "co": _reportController.text,

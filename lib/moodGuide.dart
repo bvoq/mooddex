@@ -6,9 +6,7 @@ import 'record.dart';
 
 class MoodGuide extends StatefulWidget {
   final Record record;
-  final Function callbackMoodDetail;
-  MoodGuide({Key key, @required this.record, @required this.callbackMoodDetail})
-      : super(key: key);
+  MoodGuide({Key key, @required this.record}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => MoodGuideState(record.collectionName);
@@ -126,7 +124,7 @@ class MoodGuideState extends State<MoodGuide> {
                         _moodGuideController.text,
                       )
                           .then((val) {
-                        widget.callbackMoodDetail(widget.record);
+                        //widget.callbackMoodDetail(widget.record);
                       });
                       Navigator.of(context).pop();
                     },

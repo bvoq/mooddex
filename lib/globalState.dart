@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 
 import 'guide.dart';
 import 'record.dart';
@@ -69,26 +72,16 @@ class GlobalState {
 
   Future<void> registerUser(
       FirebaseUser user, String username, String email) async {
-    DocumentSnapshot ds =
-        await Firestore.instance.collection("users").document(user.uid).get();
-    if (ds.exists) {
-      await Firestore.instance
-          .collection("users")
-          .document(user.uid)
-          .updateData({
-        "uid": user.uid,
-        "username": username,
-        "email": email,
-        "globalState": FieldValue.increment(1),
-      });
-    } else {
-      await Firestore.instance.collection("users").document(user.uid).setData({
-        "uid": user.uid,
-        "username": username,
-        "email": email,
-        "globalState": 0,
-      });
-    }
+    //DocumentSnapshot ds =
+    //    await Firestore.instance.collection("users").document(user.uid).get();
+
+    await Firestore.instance.collection("users").document(user.uid).setData({
+      "uid": user.uid,
+      "username": username,
+      "email": email,
+      "globalState": 0,
+    });
+
     return;
   }
 
@@ -96,13 +89,18 @@ class GlobalState {
     user = newUser;
     userReference =
         Firestore.instance.collection("users").document(newUser.uid);
-
+    debugPrint("wait for user reference");
     DocumentSnapshot ds = await userReference.get().catchError((onError) {
+      if (onError.code == "Error 7") FirebaseAuth.instance.signOut();
+      debugPrint("error code: " + onError.code);
       return false;
     });
+    if (!ds.exists) {
+      FirebaseAuth.instance.signOut();
+      return false;
+    }
 
     assert(ds.data["globalState"] != null);
-
     globalStateIndex = ds.data["globalState"];
     if (ds.data["username"] != null) userName = ds.data["username"];
 
@@ -111,8 +109,12 @@ class GlobalState {
         .limit(10000)
         .getDocuments()
         .catchError((onError) {
+      debugPrint("error118 on: " + onError.toString());
       return false;
+    }).catchError((error) {
+      FirebaseAuth.instance.signOut();
     });
+
     List<DocumentSnapshot> snaps = snap.documents;
     for (int i = 0; i < snaps.length; ++i) {
       RecordUser userRecord = RecordUser.fromSnapshot(snaps[i]);
@@ -124,6 +126,46 @@ class GlobalState {
 
   FirebaseUser getUser() {
     return user;
+  }
+
+  Future<void> removeRating(Record r) async {
+    int previousRating = -1;
+    String guideText = "";
+    await Firestore.instance.runTransaction((transaction) async {
+      DocumentSnapshot ds = await transaction
+          .get(userReference.collection("mymoods").document(r.collectionName));
+      if (ds.exists) {
+        previousRating = ds.data["ra"];
+        guideText = ds.data["gu"];
+        if (guideText.length > 0) {
+          await transaction
+              .update(r.reference.collection("guides").document(user.uid), {
+            "ra": 0,
+            "ca": 0,
+          });
+        }
+        await transaction.update(r.reference, {
+          "votes_" + previousRating.toString(): FieldValue.increment(-1),
+        });
+      }
+      await transaction.delete(
+          userReference.collection("mymoods").document(r.collectionName));
+
+      await transaction.update(userReference, {
+        "globalState": FieldValue.increment(1),
+      });
+    }).then((vo) {
+      userRecords.remove(r.collectionName);
+      r.votes[previousRating]--;
+      r.updateScore(r.votes);
+
+      for (int i = 0; i < updateTheseWidgetsOnUpdate.length; ++i) {
+        try {
+          updateTheseWidgetsOnUpdate[i](r);
+        } catch (e) {}
+      }
+    });
+    return;
   }
 
   Future<Record> addRating(Record r, int rating, int category) async {
@@ -200,7 +242,7 @@ class GlobalState {
 
       for (int i = 0; i < updateTheseWidgetsOnUpdate.length; ++i) {
         try {
-          updateTheseWidgetsOnUpdate[i]();
+          updateTheseWidgetsOnUpdate[i](r);
         } catch (e) {}
       }
     });
@@ -242,7 +284,7 @@ class GlobalState {
 
       for (int i = 0; i < updateTheseWidgetsOnUpdate.length; ++i) {
         try {
-          updateTheseWidgetsOnUpdate[i]();
+          updateTheseWidgetsOnUpdate[i](r);
         } catch (e) {}
       }
     });
