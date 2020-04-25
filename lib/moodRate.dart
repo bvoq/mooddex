@@ -77,13 +77,13 @@ class MoodRateState extends State<MoodRate> {
                     },
                     starCount: 10,
                     rating: _ratingForStars,
-                    size: 25.0,
+                    size: MediaQuery.of(context).size.width * 0.059,
                     filledIconData: Icons.star,
                     color: rating == 0 ? Colors.grey : Colors.green,
                     borderColor: rating == 0 ? Colors.grey : Colors.green,
                     spacing: 0.0),
               ),
-              Text(rating == 0 ? "NaN" : rating.toString(),
+              Text(rating == 0 ? "⍉" : rating.toString(),
                   style: TextStyle(
                       color: rating == 0 ? Colors.grey : Colors.green))
             ]),
@@ -96,13 +96,15 @@ class MoodRateState extends State<MoodRate> {
                 children: const <int, Widget>{
                   0: Padding(
                       padding: const EdgeInsets.only(left: 6, right: 6),
-                      child: Text("I do this")),
+                      child: Text("I do this", style: TextStyle(fontSize: 12))),
                   1: Padding(
                       padding: const EdgeInsets.only(left: 6, right: 6),
-                      child: Text("I did this")),
+                      child:
+                          Text("I did this", style: TextStyle(fontSize: 12))),
                   2: Padding(
                       padding: const EdgeInsets.only(left: 6, right: 6),
-                      child: Text("I will do this")),
+                      child: Text("I will do this",
+                          style: TextStyle(fontSize: 11))),
                 },
                 onValueChanged: (i) {
                   setState(() {

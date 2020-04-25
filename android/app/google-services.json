@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "266792360774",
+    "firebase_url": "https://mooddex-b9ca6.firebaseio.com",
+    "project_id": "mooddex-b9ca6",
+    "storage_bucket": "mooddex-b9ca6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:266792360774:android:3b8d554e28b2c0060fa347",
+        "android_client_info": {
+          "package_name": "ch.dekeyser.mooddex_client"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "266792360774-48u3fj86ci25u80k3h5e5ds08t0umok9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB6NS2RLB0qW4tr-Af26Ekhl3nH_6fxLg4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "266792360774-48u3fj86ci25u80k3h5e5ds08t0umok9.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "266792360774-ctt8t1bg3an8n0rt2sunna71r974ab2k.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "ch.dekeyser.mooddexClient",
+                "app_store_id": "962194608"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

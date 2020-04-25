@@ -335,6 +335,11 @@ class MoodGuidesState extends State<MoodGuides> {
         for (int i = 0; i < snaps.length; ++i) {
           guides[i] = Guide.fromSnapshot(snaps[i]);
         }
+        if (guides.length > 0) {
+          globalState.topGuideComment = guides[0].guideText;
+        } else {
+          globalState.topGuideComment = "";
+        }
         return SliverList(
             delegate: SliverChildBuilderDelegate((content, i) {
           return _buildItem(context, guides[i]);

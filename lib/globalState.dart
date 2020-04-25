@@ -54,6 +54,7 @@ class GlobalState {
   FirebaseUser user;
   DocumentReference userReference;
   String userName;
+  String topGuideComment = "";
 
   int globalStateIndex; //starts at 0 and will be increased atomically step-by-step on every update.
   Map<String, RecordUser> userRecords;
@@ -83,6 +84,14 @@ class GlobalState {
     });
 
     return;
+  }
+
+  String getTopGuideComment() {
+    return topGuideComment;
+  }
+
+  void setTopGuideComment(String str) {
+    topGuideComment = str;
   }
 
   Future<bool> setUser(FirebaseUser newUser) async {

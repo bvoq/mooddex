@@ -62,14 +62,16 @@ class MoodGuideState extends State<MoodGuide> {
                   )),*/
               Padding(
                 padding: const EdgeInsets.only(left: 3, bottom: 6),
-                child: Text("Some tips for writing a good guide:\n\n" +
-                    "• Describe the mood in 1-3 sentences.\n" +
-                    "• Then share how to best experience it.\n" +
-                    (rating > 0
-                        ? "• Justify your rating of " +
-                            rating.toString() +
-                            " (pros/cons)."
-                        : "• Justify the pros and cons the mood.")),
+                child: Text(
+                    "Some tips for writing a good guide:\n\n" +
+                        "• Describe the mood in 1-3 sentences.\n" +
+                        "• Then share how to best experience it.\n" +
+                        (rating > 0
+                            ? "• Justify your rating of " +
+                                rating.toString() +
+                                " (pros/cons)."
+                            : "• Justify the pros and cons the mood."),
+                    style: TextStyle(fontSize: 13)),
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 3, top: 16, bottom: 8),
@@ -77,7 +79,7 @@ class MoodGuideState extends State<MoodGuide> {
                   scrollDirection: Axis.vertical,
                   child: ConstrainedBox(
                     constraints: new BoxConstraints(
-                      maxHeight: MediaQuery.of(context).size.height * 0.3,
+                      maxHeight: MediaQuery.of(context).size.height * 0.2,
                     ),
                     child: TextField(
                       style: TextStyle(fontSize: 14),

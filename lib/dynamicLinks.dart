@@ -5,6 +5,7 @@ import 'package:mooddex_client/moodDetail.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:share/share.dart';
 
+import 'globalState.dart';
 import 'record.dart';
 
 Future<Uri> createDynamicLink(Record record) async {
@@ -40,13 +41,17 @@ Future<Uri> createDynamicLink(Record record) async {
           " user" +
           (record.added > 0 ? "s" : "") +
           "!\n" +
-          record.link,
+          record.link +
+          "\n" +
+          globalState.topGuideComment,
       imageUrl: imageURI,
     ),
   );
 
   final ShortDynamicLink shortDynamicLink = await parameters.buildShortLink();
   final Uri shortUrl = shortDynamicLink.shortUrl;
+
+  // String guideLink;
 
   return shortUrl;
 }
