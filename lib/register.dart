@@ -81,6 +81,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         hintText: "beast"),
                     controller: userNameInputController,
                     validator: userNameValidator,
+                    maxLength: 32,
                   ),
                   TextFormField(
                     autocorrect: false,

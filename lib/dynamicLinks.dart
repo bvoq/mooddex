@@ -16,13 +16,13 @@ Future<Uri> createDynamicLink(Record record) async {
     link:
         Uri.parse('https://dekeyser.ch/mooddex/moods/' + record.collectionName),
     androidParameters: AndroidParameters(
-      packageName: 'ch.dekeyser.mooddexClient',
+      packageName: 'ch.dekeyser.mooddex_client',
       minimumVersion: 0,
     ),
     iosParameters: IosParameters(
       bundleId: 'ch.dekeyser.mooddexClient',
       minimumVersion: '1.0.0',
-      appStoreId: '962194608', //should be changed later.
+      appStoreId: '1508217727', //should be changed later.
     ),
     googleAnalyticsParameters: GoogleAnalyticsParameters(
       campaign: 'example-promo',

@@ -246,7 +246,9 @@ class MoodButtons extends SliverPersistentHeaderDelegate {
     List<Widget> buttonWidgets = new List<Widget>();
     buttonWidgets.add(_buildButtonColumn(
         Theme.of(context).accentColor,
-        Icons.thumbs_up_down,
+        globalState.userRecords.containsKey(record.collectionName)
+            ? Icons.thumbs_up_down
+            : Icons.add,
         globalState.userRecords.containsKey(record.collectionName)
             ? "EDIT RATING"
             : "ADD MOOD",
@@ -323,7 +325,7 @@ class MoodGuidesState extends State<MoodGuides> {
     return StreamBuilder<QuerySnapshot>(
       stream: widget.initialRecord.reference
           .collection("guides")
-          .orderBy("ts")
+          .orderBy("hf")
           .limit(100)
           .snapshots(),
       builder: (context, snapshot) {
@@ -340,6 +342,7 @@ class MoodGuidesState extends State<MoodGuides> {
         } else {
           globalState.topGuideComment = "";
         }
+        guides = guides.where((g) => g.guideText.length > 0).toList();
         return SliverList(
             delegate: SliverChildBuilderDelegate((content, i) {
           return _buildItem(context, guides[i]);

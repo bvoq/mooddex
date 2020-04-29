@@ -69,12 +69,12 @@ class MyMoodsState extends State<MyMoods> {
         child: DataTable(
             sortColumnIndex: currentSortedIndex,
             sortAscending: sortingOrders[currentSortedIndex] >= 0,
-            columnSpacing: 12,
+            columnSpacing: 0,
             horizontalMargin: 24,
             columns: [
               DataColumn(
                 label: Container(
-                  width: (MediaQuery.of(context).size.width - 6 * 24) * 0.63,
+                  width: (MediaQuery.of(context).size.width - 5.3 * 24) * 0.59,
                   child: Text("Name"),
                 ),
                 onSort: (columnIndex, sortAscending) =>
@@ -83,7 +83,7 @@ class MyMoodsState extends State<MyMoods> {
               ),
               DataColumn(
                 label: Container(
-                  width: (MediaQuery.of(context).size.width - 6 * 24) * 0.22,
+                  width: (MediaQuery.of(context).size.width - 6 * 24) * 0.24,
                   child: Text("Category"),
                 ),
                 onSort: (columnIndex, sortAscending) =>
@@ -92,7 +92,7 @@ class MyMoodsState extends State<MyMoods> {
               ),
               DataColumn(
                   label: Container(
-                    width: (MediaQuery.of(context).size.width - 6 * 24) * 0.15,
+                    width: (MediaQuery.of(context).size.width - 6 * 24) * 0.17,
                     child: Text("Rating"),
                   ),
                   onSort: (columnIndex, sortAscending) =>
@@ -120,24 +120,25 @@ class MyMoodsState extends State<MyMoods> {
       sliver: SliverToBoxAdapter(
         child: Container(
           child: DataTable(
-            columnSpacing: 12,
+            columnSpacing: 0,
             horizontalMargin: 24,
             dataRowHeight: 48,
             columns: [
               DataColumn(
                 label: Container(
-                  width: (MediaQuery.of(context).size.width - 6 * 24) * 0.63,
+                  width: (MediaQuery.of(context).size.width - 4.5 * 24) * 0.59,
                 ),
               ),
               DataColumn(
                 label: Container(
-                  width: (MediaQuery.of(context).size.width - 6 * 24) * 0.22,
+                  width: (MediaQuery.of(context).size.width - 4.5 * 24) * 0.24,
                 ),
                 numeric: false,
               ),
               DataColumn(
                   label: Container(
-                    width: (MediaQuery.of(context).size.width - 6 * 24) * 0.15,
+                    width:
+                        (MediaQuery.of(context).size.width - 4.5 * 24) * 0.17,
                   ),
                   numeric: true),
             ],
@@ -148,8 +149,9 @@ class MyMoodsState extends State<MyMoods> {
                       DataCell(
                         Container(
                           alignment: Alignment.centerLeft,
-                          width: (MediaQuery.of(context).size.width - 6 * 24) *
-                              0.63,
+                          width:
+                              (MediaQuery.of(context).size.width - 4.5 * 24) *
+                                  0.59,
                           height: 48,
                           child: Text(recordUser.name),
                         ),
@@ -160,8 +162,8 @@ class MyMoodsState extends State<MyMoods> {
                           Container(
                             alignment: Alignment.centerLeft,
                             width:
-                                (MediaQuery.of(context).size.width - 6 * 24) *
-                                    0.22,
+                                (MediaQuery.of(context).size.width - 4.5 * 24) *
+                                    0.24,
                             height: 48,
                             child: Text(recordUser.category == 0
                                 ? "I do this"
@@ -177,8 +179,8 @@ class MyMoodsState extends State<MyMoods> {
                         Container(
                             alignment: Alignment.centerRight,
                             width:
-                                (MediaQuery.of(context).size.width - 6 * 24) *
-                                    0.15,
+                                (MediaQuery.of(context).size.width - 4.5 * 24) *
+                                    0.17,
                             height: 48,
                             child: Text(recordUser.rating == 0
                                 ? "NaN"
@@ -304,7 +306,9 @@ class MoodHomeState extends State<MoodHome> {
                     children: [
                       CupertinoNavigationBar(middle: Text("My Profile")),
                       Spacer(flex: 1),
-                      Text("User: " + globalState.userName),
+                      Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 48),
+                          child: Text("User: " + globalState.userName)),
                       Spacer(flex: 6),
                       globalState.user.isAnonymous
                           ? Center(
