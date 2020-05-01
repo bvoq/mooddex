@@ -271,6 +271,7 @@ class Record {
               'author': author,
               'link': link,
               'location': "",
+              'ts': FieldValue.serverTimestamp(),
             }).then((onValue) {
               debugPrint("final set data");
               uploaded = true;
