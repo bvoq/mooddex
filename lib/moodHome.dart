@@ -11,6 +11,7 @@ import 'register.dart';
 import 'dynamicLinks.dart';
 
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MyMoods extends StatefulWidget {
   @override
@@ -339,6 +340,12 @@ class MoodHomeState extends State<MoodHome> {
                                   ));
                             }),
                       ),
+                      Spacer(flex: 1),
+                      CupertinoButton(
+                          child: Text("About page"),
+                          onPressed: () {
+                            launch("https://mood-dex.com/about");
+                          }),
                       Spacer(flex: 1),
                       CupertinoButton(
                           child: Text("Give feedback"),

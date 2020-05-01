@@ -30,17 +30,39 @@ void tappedOnMood(BuildContext context, String collectionName) {
     debugPrint("calling le window history");
     //const state = { 'page_id': 1, 'user_id': 5 }
     Record record = Record.fromSnapshot(snapshot);
-    Uri uri = await createDynamicLink(record);
-
-    debugPrint("uri is: " + uri.toString());
-
-    html.window.history.pushState(null, "", "/dyl/" + collectionName);
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => MoodDetail(initialRecord: record),
-        ));
+    changeToMoodDetail(context, record);
   });
+}
+
+void changeToMoodDetail(BuildContext context, Record record) {
+  if (kIsWeb) {
+    String longURLPart1 =
+        "/dy/?isi=1508217727&ibi=ch.dekeyser.mooddexClient&imv=1.0.0&link=https%3A%2F%2Fmood-dex.com%2F%3F";
+    String longURLPart2 = Uri.encodeComponent(record.collectionName);
+    String longURLPart3 = "&si=" + Uri.encodeComponent(record.imageURL);
+    String longURLPart4 = "&sd=" +
+        Uri.encodeComponent(record.name +
+            " is experienced by " +
+            record.added.toString() +
+            " user" +
+            (record.added == 1 ? "!" : "s!"));
+    String longURLPart5 = "&amv=0&st=" + Uri.encodeComponent(record.name);
+    String longURLPart6 = "&apn=ch.dekeyser.mooddex_client";
+
+    String fullLongURL = longURLPart1 +
+        longURLPart2 +
+        longURLPart3 +
+        longURLPart4 +
+        longURLPart5 +
+        longURLPart6;
+    debugPrint("full long url to push state: " + fullLongURL);
+    html.window.history.pushState(null, "", fullLongURL);
+  }
+  Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MoodDetail(initialRecord: record),
+      ));
 }
 
 class MoodHeader extends SliverPersistentHeaderDelegate {
@@ -576,5 +598,10 @@ class MoodDetailState extends State<MoodDetail> {
             guides,
           ],
         ));
+  }
+
+  @override
+  void dispose() {
+    if (kIsWeb) html.window.history.pushState(null, "", "");
   }
 }

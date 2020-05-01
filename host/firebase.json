@@ -1,10 +1,17 @@
 {
-  "hosting": {
-    "public": "public",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ]
-  }
+	"hosting": {
+		"headers": [
+			{ "source":"/service-worker.js", "headers": [{"key": "Cache-Control", "value": "no-cache"}] }
+		],
+		"public": "public",
+		"ignore": [
+			"firebase.json",
+			"**/.*",
+			"**/node_modules/**"
+		],
+		// Dynamic Links will start with https://mood-dex.com/dy
+		"appAssociation": "AUTO",
+		"rewrites": [ { "source": "/dy/**", "dynamicLinks": true } ]
+	}
 }
+

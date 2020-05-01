@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/cupertino.dart';
 
 import 'moodDetail.dart';
@@ -23,7 +23,7 @@ Widget _buildList(
     BuildContext context, List<DocumentSnapshot> snapshot, String query) {
   List<Widget> searchWidgets =
       snapshot.map((data) => _buildListItem(context, data, query)).toList();
-  searchWidgets.add(_addNewMood(context, query));
+  if (!kIsWeb) searchWidgets.add(_addNewMood(context, query));
   return ListView(
     padding: const EdgeInsets.only(top: 20.0),
     children: searchWidgets,
@@ -125,11 +125,7 @@ Widget _buildListItem(
           ),
           onTap: () async {
             //record.loadImageFromFirebase().then((void v) =>
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => MoodDetail(initialRecord: record),
-                ));
+            changeToMoodDetail(context, record);
           }
           // Navigator.of(context).push(record.findValue), //print(record),
           ),
