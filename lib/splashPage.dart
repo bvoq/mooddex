@@ -83,7 +83,7 @@ class _SplashPageState extends State<SplashPage> {
                     Align(
                         alignment: Alignment.bottomLeft,
                         child: Image.asset("images/philosopher.png",
-                            width: MediaQuery.of(context).size.width * 1)),
+                            height: MediaQuery.of(context).size.height * 0.5)),
                     Align(
                       //top: MediaQuery.of(context).size.height * 0.5 * 0.6,
                       alignment: Alignment.topCenter,

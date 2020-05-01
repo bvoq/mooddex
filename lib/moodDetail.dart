@@ -2,7 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:universal_html/prefer_universal/html.dart' as html;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mooddex_client/dynamicLinks.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -13,13 +14,27 @@ import 'record.dart';
 import 'moodRate.dart';
 import 'moodGuide.dart';
 import 'moodReport.dart';
+import 'dynamicLinks.dart';
+/*
+@JS()
+@anonymous
+class EmptyObject {
+  external EmptyObject();
+}*/
 
 void tappedOnMood(BuildContext context, String collectionName) {
   debugPrint("loading mood " + collectionName);
   DocumentReference dr =
       Firestore.instance.collection('moods').document(collectionName);
-  dr.get().then((DocumentSnapshot snapshot) {
+  dr.get().then((DocumentSnapshot snapshot) async {
+    debugPrint("calling le window history");
+    //const state = { 'page_id': 1, 'user_id': 5 }
     Record record = Record.fromSnapshot(snapshot);
+    Uri uri = await createDynamicLink(record);
+
+    debugPrint("uri is: " + uri.toString());
+
+    html.window.history.pushState(null, "", "/dyl/" + collectionName);
     Navigator.push(
         context,
         MaterialPageRoute(
@@ -41,28 +56,27 @@ class MoodHeader extends SliverPersistentHeaderDelegate {
       BuildContext context, double shrinkOffset, bool overlapsContent) {
     size = MediaQuery.of(context).size;
 
-    return FutureBuilder(
-        future: _loadImageFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            if (snapshot.hasError || record.image == null) {
-              return Center(
-                  child: Text("Image could not be loaded.",
-                      style: TextStyle(color: Colors.grey)));
+    if (kIsWeb) {
+      return Image.network(record.imageURL,
+          width: size.width, height: 300, fit: BoxFit.cover);
+    } else {
+      return FutureBuilder(
+          future: _loadImageFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              if (snapshot.hasError || record.image == null) {
+                return Center(
+                    child: Text("Image could not be loaded.",
+                        style: TextStyle(color: Colors.grey)));
+              } else {
+                return Image.file(File(record.image),
+                    width: size.width, height: 300, fit: BoxFit.cover);
+              }
             } else {
-              return Image.file(File(record.image),
-                  width: size.width, height: 300, fit: BoxFit.cover);
-            }
-          } else {
-            return Center(child: CircularProgressIndicator());
-          } // LinearProgressIndicator();
-        });
-
-    /*Image.asset('./images/bubbles.jpg',
-        width: size.width,
-        //height: MediaQuery.of(context).size.height / 4,
-        fit: BoxFit.fitWidth);
-    */
+              return Center(child: CircularProgressIndicator());
+            } // LinearProgressIndicator();
+          });
+    }
   }
 
   @override
@@ -268,14 +282,6 @@ class MoodButtons extends SliverPersistentHeaderDelegate {
           context: context,
           builder: (BuildContext context) => MoodGuide(record: record));
     }));
-
-    /*
-    if (globalState.userRecords.containsKey(record.collectionName)) {
-      buttonWidgets.add(_buildButtonColumn(
-          Theme.of(context).accentColor, Icons.remove, 'REMOVE', () async {
-        globalState.removeRating(record).then((vo) {});
-      }));
-    }*/
 
     buttonWidgets.add(_buildButtonColumn(
         Theme.of(context).accentColor, Icons.share, 'SHARE', () async {

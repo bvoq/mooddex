@@ -119,7 +119,7 @@ Widget _buildListItem(
             child: Row(
               children: [
                 Icon(Icons.people),
-                Text(record.totalvotes.toString()),
+                Text(record.added.toString()),
               ],
             ),
           ),

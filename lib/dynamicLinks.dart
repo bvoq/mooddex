@@ -12,9 +12,8 @@ Future<Uri> createDynamicLink(Record record) async {
   Uri imageURI = Uri.parse(record.imageURL);
 
   final DynamicLinkParameters parameters = DynamicLinkParameters(
-    uriPrefix: 'https://mooddex.page.link',
-    link:
-        Uri.parse('https://dekeyser.ch/mooddex/moods/' + record.collectionName),
+    uriPrefix: 'https://mood-dex.com/dyl',
+    link: Uri.parse('https://mood-dex.com/?' + record.collectionName),
     androidParameters: AndroidParameters(
       packageName: 'ch.dekeyser.mooddex_client',
       minimumVersion: 0,
@@ -69,7 +68,13 @@ void initDynamicLinks(BuildContext context) async {
   final Uri deepLink = data?.link;
   if (deepLink != null) {
     String fullString = deepLink.toString();
-    if (fullString.startsWith("https://dekeyser.ch/mooddex/moods/")) {
+    if (fullString.startsWith("https://mood-dex.com/moods?")) {
+      String collectionName =
+          fullString.substring("https://mood-dex.com/moods?".length);
+      debugPrint("First mood: " + collectionName.toString());
+      tappedOnMood(context, collectionName);
+    } else if (fullString.startsWith("https://dekeyser.ch/mooddex/moods/")) {
+      //pre version
       String collectionName =
           fullString.substring("https://dekeyser.ch/mooddex/moods/".length);
       debugPrint("First mood: " + collectionName.toString());
@@ -85,7 +90,13 @@ void initDynamicLinks(BuildContext context) async {
       //first extract the record
       String fullString = deepLink.toString();
       debugPrint("full second string: " + fullString);
-      if (fullString.startsWith("https://dekeyser.ch/mooddex/moods/")) {
+      if (fullString.startsWith("https://mood-dex.com/moods?")) {
+        String collectionName =
+            fullString.substring("https://mood-dex.com/moods?".length);
+        debugPrint("Second mood: " + collectionName.toString());
+        tappedOnMood(context, collectionName);
+      } else if (fullString.startsWith("https://dekeyser.ch/mooddex/moods/")) {
+        //pre version
         String collectionName =
             fullString.substring("https://dekeyser.ch/mooddex/moods/".length);
         debugPrint("Second mood: " + collectionName.toString());

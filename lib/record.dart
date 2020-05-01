@@ -74,7 +74,7 @@ class Record {
         assert(map['author'] != null),
         assert(map['link'] != null),
         name = map['name'],
-        added = map['added'],
+        added = 0,
         //votes = map['votes'].cast<int>(),
         votes = [
           map['votes_0'],
