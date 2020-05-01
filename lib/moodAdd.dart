@@ -70,8 +70,9 @@ class MoodAddState extends State<MoodAdd> {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => MoodDetail(initialRecord: r),
-                ));
+                    builder: (context) => MoodDetail(
+                        initialRecord: r,
+                        deviceHeight: MediaQuery.of(context).size.height)));
           });
         } else {}
       });

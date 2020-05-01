@@ -207,7 +207,7 @@ class Record {
 
     String dowurl = await (await uploadTask.onComplete).ref.getDownloadURL();
 
-    debugPrint("finished uploading image");
+    debugPrint("finished uploading image ref: " + dowurl);
     imageURL = dowurl;
   }
 
@@ -274,7 +274,9 @@ class Record {
             }).then((onValue) {
               debugPrint("final set data");
               uploaded = true;
-            }).catchError((onError) {});
+            }).catchError((onError) {
+              debugPrint("error happened: " + onError.toString());
+            });
           }
         });
       }

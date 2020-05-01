@@ -61,16 +61,20 @@ void changeToMoodDetail(BuildContext context, Record record) {
   Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => MoodDetail(initialRecord: record),
+        builder: (context) => MoodDetail(
+            initialRecord: record,
+            deviceHeight: MediaQuery.of(context).size.height),
       ));
 }
 
 class MoodHeader extends SliverPersistentHeaderDelegate {
   final Record record;
   Future<bool> _loadImageFuture;
-  MoodHeader(Record record)
+  double sliverMaxHeight;
+  MoodHeader(Record record, double sliverMaxHeight)
       : record = record,
-        _loadImageFuture = record.loadImageFromFirebase();
+        _loadImageFuture = record.loadImageFromFirebase(),
+        sliverMaxHeight = sliverMaxHeight;
 
   Size size;
   @override
@@ -80,7 +84,7 @@ class MoodHeader extends SliverPersistentHeaderDelegate {
 
     if (kIsWeb) {
       return Image.network(record.imageURL,
-          width: size.width, height: 300, fit: BoxFit.cover);
+          width: size.width, height: sliverMaxHeight, fit: BoxFit.cover);
     } else {
       return FutureBuilder(
           future: _loadImageFuture,
@@ -92,7 +96,9 @@ class MoodHeader extends SliverPersistentHeaderDelegate {
                         style: TextStyle(color: Colors.grey)));
               } else {
                 return Image.file(File(record.image),
-                    width: size.width, height: 300, fit: BoxFit.cover);
+                    width: size.width,
+                    height: sliverMaxHeight,
+                    fit: BoxFit.cover);
               }
             } else {
               return Center(child: CircularProgressIndicator());
@@ -105,7 +111,7 @@ class MoodHeader extends SliverPersistentHeaderDelegate {
   bool shouldRebuild(SliverPersistentHeaderDelegate _) => true;
 
   @override
-  double get maxExtent => 300; //modify for tablet!! 480
+  double get maxExtent => sliverMaxHeight; //modify for tablet!! 480
 
   @override
   double get minExtent => 0;
@@ -542,10 +548,14 @@ class MoodGuidesState extends State<MoodGuides> {
 
 class MoodDetail extends StatefulWidget {
   final Record initialRecord;
-  MoodDetail({Key key, @required this.initialRecord}) : super(key: key);
+  final double deviceHeight;
+  MoodDetail(
+      {Key key, @required this.initialRecord, @required this.deviceHeight})
+      : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => MoodDetailState(initialRecord);
+  State<StatefulWidget> createState() =>
+      MoodDetailState(initialRecord, deviceHeight);
 }
 
 class MoodDetailState extends State<MoodDetail> {
@@ -557,9 +567,10 @@ class MoodDetailState extends State<MoodDetail> {
   MoodGuides guides;
   Record record;
 
-  MoodDetailState(Record record) {
+  MoodDetailState(Record record, double deviceHeight) {
     debugPrint(record.name);
-    header = MoodHeader(record);
+    header =
+        MoodHeader(record, deviceHeight * 1597.0 / 2584); //golden ratio boys
     title = MoodTitle(record);
     buttons = MoodButtons(record);
     guides = MoodGuides(initialRecord: record);

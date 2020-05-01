@@ -319,7 +319,6 @@ class GlobalState {
                 ? FieldValue.increment(vote)
                 : FieldValue.increment(2 * vote)
           });
-
           await transaction.update(uservoteonguide, {
             "hf": vote,
           });

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -98,13 +100,23 @@ class MoodReportState extends State<MoodReport> {
                   isDefaultAction: true,
                   child: Text("Create feedback"),
                   onPressed: () async {
+                    debugPrint("So far so gucci: " +
+                        globalState.userName +
+                        " " +
+                        widget.reportType +
+                        " " +
+                        _reportController.text);
+                    int i = (new Random()).nextInt(100000);
                     await Firestore.instance.collection("reports").add({
                       "au": globalState.userName,
+                      "uid": globalState.user.uid,
                       "rt": widget.reportType,
                       "rl": widget.reportLocation,
                       "co": _reportController.text,
                       "ts": FieldValue.serverTimestamp(),
                     });
+                    debugPrint("Finna added report");
+
                     Navigator.of(context).pop();
                   },
                 )),
