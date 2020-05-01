@@ -388,6 +388,10 @@ class MoodHomeState extends State<MoodHome> {
         items: [
           BottomNavigationBarItem(
               icon: Icon(Icons.art_track), title: Text('My Moods')),
+          // BottomNavigationBarItem(
+          //     icon: Icon(Icons.search), title: Text('Search Moods')),
+          // BottomNavigationBarItem(
+          //     icon: Icon(Icons.burst_mode), title: Text('Swipe Moods')),
           BottomNavigationBarItem(
               icon: Icon(Icons.person), title: Text('Profile')),
         ],

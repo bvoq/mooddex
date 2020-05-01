@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -252,6 +253,7 @@ class Record {
         await _uploadImage().then((onValue) async {
           if (imageURL.length > 0) {
             debugPrint("time to upload " + author);
+
             await _reference.setData({
               'name': name,
               'search_terms': searchTerms,
@@ -271,6 +273,7 @@ class Record {
               'author': author,
               'link': link,
               'location': "",
+              'rnd': (new Random()).nextDouble(),
               'ts': FieldValue.serverTimestamp(),
             }).then((onValue) {
               debugPrint("final set data");
