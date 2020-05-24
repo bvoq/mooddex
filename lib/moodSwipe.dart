@@ -39,7 +39,7 @@ class MoodSwipeState extends State<MoodSwipe> {
           .collection('moods')
           .orderBy('rnd')
           .startAt([val])
-          .limit(5)
+          .limit(5 - cards.length)
           /*
           .where('searchable', isEqualTo: true)
           .limit(1)*/
@@ -59,8 +59,7 @@ class MoodSwipeState extends State<MoodSwipe> {
               for (int i = 0; i < snaps.length && cards.length < 5; ++i) {
                 Record record = Record.fromSnapshot(snaps[i]);
                 MoodDetail mood = MoodDetail(
-                  key: Key(record.collectionName +
-                      rnd.nextInt(100000000).toString()),
+                  key: UniqueKey(),
                   initialRecord: record,
                   deviceHeight: height / 1.5,
                 );
@@ -90,66 +89,41 @@ class MoodSwipeState extends State<MoodSwipe> {
     return FutureBuilder(
         future: initialLoadF,
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            if (snapshot.hasError ||
-                initialLoad == false ||
-                cards.length == 0) {
-              return Center(child: CircularProgressIndicator());
-            } else {
-              return Container(
-                color:
-                    Theme.of(context).scaffoldBackgroundColor.withOpacity(0.98),
-                child: Column(
-                  children: [
-                    CupertinoNavigationBar(
-                      middle: Text("Discover Moods"),
-                      trailing: GestureDetector(
-                        onTap: () {
-                          showSearch(
-                            context: context,
-                            delegate: MoodSearchMaterial(),
-                          );
-                        },
-                        child: Icon(
-                          CupertinoIcons.search,
-                          color: CupertinoColors.black,
-                        ),
+          if (cards.length == 0) {
+            return Center(child: CircularProgressIndicator());
+          } else {
+            return Container(
+              color:
+                  Theme.of(context).scaffoldBackgroundColor.withOpacity(0.98),
+              child: Column(
+                children: [
+                  CupertinoNavigationBar(
+                    middle: Text("Discover Moods"),
+                    trailing: GestureDetector(
+                      onTap: () {
+                        showSearch(
+                          context: context,
+                          delegate: MoodSearchMaterial(),
+                        );
+                      },
+                      child: Icon(
+                        CupertinoIcons.search,
+                        color: CupertinoColors.black,
                       ),
                     ),
-                    Container(
-                      width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.height - 120,
-                      child: Stack(
-                        alignment: AlignmentDirectional.center,
-                        children: List.generate(
-                          cards.length,
-                          (i) => Positioned(
-                            top: 40 + 20.0 * i,
-                            child: (i + 1 == cards.length)
-                                ? Dismissible(
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(75),
-                                      child: Container(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width /
-                                              1.5,
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height /
-                                              1.5,
-                                          child: cards[cards.length - i - 1]),
-                                    ),
-                                    key: cards[cards.length - i - 1].key,
-                                    onDismissed: (direction) {
-                                      cards.removeAt(cards.length - i - 1);
-                                      loadCards(
-                                        MediaQuery.of(context).size.width,
-                                        MediaQuery.of(context).size.height,
-                                      );
-                                    },
-                                  )
-                                : ClipRRect(
+                  ),
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height - 120,
+                    child: Stack(
+                      alignment: AlignmentDirectional.center,
+                      children: List.generate(
+                        cards.length,
+                        (i) => Positioned(
+                          top: 40 + 20.0 * i,
+                          child: (i + 1 == cards.length)
+                              ? Dismissible(
+                                  child: ClipRRect(
                                     borderRadius: BorderRadius.circular(75),
                                     child: Container(
                                         width:
@@ -160,16 +134,32 @@ class MoodSwipeState extends State<MoodSwipe> {
                                                 1.5,
                                         child: cards[cards.length - i - 1]),
                                   ),
-                          ),
+                                  key: cards[cards.length - i - 1].key,
+                                  onDismissed: (direction) {
+                                    cards.removeAt(cards.length - i - 1);
+                                    loadCards(
+                                      MediaQuery.of(context).size.width,
+                                      MediaQuery.of(context).size.height,
+                                    );
+                                  },
+                                )
+                              : ClipRRect(
+                                  borderRadius: BorderRadius.circular(75),
+                                  child: Container(
+                                      width: MediaQuery.of(context).size.width /
+                                          1.5,
+                                      height:
+                                          MediaQuery.of(context).size.height /
+                                              1.5,
+                                      child: cards[cards.length - i - 1]),
+                                ),
                         ),
                       ),
                     ),
-                  ],
-                ),
-              );
-            }
-          } else {
-            return Center(child: CircularProgressIndicator());
+                  ),
+                ],
+              ),
+            );
           }
         });
   }
