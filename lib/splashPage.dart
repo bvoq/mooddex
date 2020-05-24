@@ -33,7 +33,12 @@ class _SplashPageState extends State<SplashPage> {
                 .get()
                 .then((DocumentSnapshot result) {
               Navigator.pushReplacement(
-                  context, MaterialPageRoute(builder: (context) => MoodHome()));
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => MoodHome(
+                            width: MediaQuery.of(context).size.width,
+                            height: MediaQuery.of(context).size.height,
+                          )));
               success = true;
             }).catchError((err) => setState(() {
                       success = false;
@@ -126,7 +131,16 @@ class _SplashPageState extends State<SplashPage> {
                                               context,
                                               MaterialPageRoute(
                                                   builder: (context) =>
-                                                      MoodHome()));
+                                                      MoodHome(
+                                                        width: MediaQuery.of(
+                                                                context)
+                                                            .size
+                                                            .width,
+                                                        height: MediaQuery.of(
+                                                                context)
+                                                            .size
+                                                            .height,
+                                                      )));
                                         }).catchError((err) => setState(() {
                                                   success = false;
                                                 }));

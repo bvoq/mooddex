@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'moodSearch.dart';
 import 'moodDetail.dart';
 import 'moodReport.dart';
+import 'moodSwipe.dart';
 import 'globalState.dart';
 import 'login.dart';
 import 'record.dart';
@@ -208,17 +209,22 @@ class MyMoodsState extends State<MyMoods> {
 }
 
 class MoodHome extends StatefulWidget {
+  double width, height;
+  MoodHome({Key key, @required this.width, @required this.height})
+      : super(key: key);
   @override
-  MoodHomeState createState() => MoodHomeState();
+  MoodHomeState createState() => MoodHomeState(width, height);
 }
 
 class MoodHomeState extends State<MoodHome> {
   int bottomNavigationIndex;
   MyMoods myMoods;
+  MoodSwipe moodSwipe;
 
-  MoodHomeState() {
+  MoodHomeState(double width, double height) {
     bottomNavigationIndex = 0;
     myMoods = MyMoods();
+    moodSwipe = MoodSwipe(width: width, height: height);
   }
 
   @override
@@ -301,73 +307,77 @@ class MoodHomeState extends State<MoodHome> {
               ],
             )
           : bottomNavigationIndex == 1
-              ? Container(
-                  child: Column(
-                    children: [
-                      CupertinoNavigationBar(middle: Text("My Profile")),
-                      Spacer(flex: 1),
-                      Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 48),
-                          child: Text("User: " + globalState.userName)),
-                      Spacer(flex: 6),
-                      globalState.user.isAnonymous
-                          ? Center(
-                              child: RaisedButton(
-                                child:
-                                    Text("Register and link anonymous account"),
+              ? moodSwipe
+              : bottomNavigationIndex == 2
+                  ? Container(
+                      child: Column(
+                        children: [
+                          CupertinoNavigationBar(middle: Text("My Profile")),
+                          Spacer(flex: 1),
+                          Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 48),
+                              child: Text("User: " + globalState.userName)),
+                          Spacer(flex: 6),
+                          globalState.user.isAnonymous
+                              ? Center(
+                                  child: RaisedButton(
+                                    child: Text(
+                                        "Register and link anonymous account"),
+                                    color: Theme.of(context).primaryColor,
+                                    textColor: Colors.white,
+                                    onPressed: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                RegisterPage(),
+                                          ));
+                                    },
+                                  ),
+                                )
+                              : Spacer(flex: 1),
+                          Center(
+                            child: RaisedButton(
+                                child: Text("Login with a different account"),
                                 color: Theme.of(context).primaryColor,
                                 textColor: Colors.white,
                                 onPressed: () {
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => RegisterPage(),
+                                        builder: (context) => LoginPage(),
                                       ));
-                                },
-                              ),
-                            )
-                          : Spacer(flex: 1),
-                      Center(
-                        child: RaisedButton(
-                            child: Text("Login with a different account"),
-                            color: Theme.of(context).primaryColor,
-                            textColor: Colors.white,
-                            onPressed: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => LoginPage(),
-                                  ));
-                            }),
+                                }),
+                          ),
+                          Spacer(flex: 1),
+                          CupertinoButton(
+                              child: Text("About page"),
+                              onPressed: () {
+                                launch("https://mood-dex.com/about");
+                              }),
+                          Spacer(flex: 1),
+                          CupertinoButton(
+                              child: Text("Give feedback"),
+                              onPressed: () {
+                                showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) => MoodReport(
+                                        reportType: "feedback",
+                                        reportLocation: "other_" +
+                                            (new DateTime.now())
+                                                .millisecondsSinceEpoch
+                                                .toString() +
+                                            "_" +
+                                            globalState.getUser().uid,
+                                        reportDescription:
+                                            "Please type your feedback here.\n"));
+                              }),
+                          Spacer(flex: 2),
+                        ],
                       ),
-                      Spacer(flex: 1),
-                      CupertinoButton(
-                          child: Text("About page"),
-                          onPressed: () {
-                            launch("https://mood-dex.com/about");
-                          }),
-                      Spacer(flex: 1),
-                      CupertinoButton(
-                          child: Text("Give feedback"),
-                          onPressed: () {
-                            showDialog(
-                                context: context,
-                                builder: (BuildContext context) => MoodReport(
-                                    reportType: "feedback",
-                                    reportLocation: "other_" +
-                                        (new DateTime.now())
-                                            .millisecondsSinceEpoch
-                                            .toString() +
-                                        "_" +
-                                        globalState.getUser().uid,
-                                    reportDescription:
-                                        "Please type your feedback here.\n"));
-                          }),
-                      Spacer(flex: 2),
-                    ],
-                  ),
-                )
-              : Container(),
+                    )
+                  : Container(),
+      /*
       floatingActionButton: FloatingActionButton(
         isExtended: true,
         mini: true,
@@ -376,7 +386,7 @@ class MoodHomeState extends State<MoodHome> {
           context: context,
           delegate: MoodSearchMaterial(),
         ),
-      ),
+      ),*/
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: bottomNavigationIndex,
         onTap: (index) {
@@ -385,13 +395,12 @@ class MoodHomeState extends State<MoodHome> {
           });
         },
         //color: Colors.orange,
+        //type: BottomNavigationBarType.fixed,
         items: [
           BottomNavigationBarItem(
               icon: Icon(Icons.art_track), title: Text('My Moods')),
-          // BottomNavigationBarItem(
-          //     icon: Icon(Icons.search), title: Text('Search Moods')),
-          // BottomNavigationBarItem(
-          //     icon: Icon(Icons.burst_mode), title: Text('Swipe Moods')),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.burst_mode), title: Text('Discover')),
           BottomNavigationBarItem(
               icon: Icon(Icons.person), title: Text('Profile')),
         ],

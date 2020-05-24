@@ -136,7 +136,13 @@ class _LoginPageState extends State<LoginPage> {
                             Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => MoodHome()));
+                                    builder: (context) => MoodHome(
+                                          width:
+                                              MediaQuery.of(context).size.width,
+                                          height: MediaQuery.of(context)
+                                              .size
+                                              .height,
+                                        )));
                             //.catchError((err) => debugPrint(err)))
                           } else {
                             errorMessage = Text("Login failed.",

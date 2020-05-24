@@ -549,8 +549,9 @@ class MoodGuidesState extends State<MoodGuides> {
 class MoodDetail extends StatefulWidget {
   final Record initialRecord;
   final double deviceHeight;
+  Key key;
   MoodDetail(
-      {Key key, @required this.initialRecord, @required this.deviceHeight})
+      {this.key, @required this.initialRecord, @required this.deviceHeight})
       : super(key: key);
 
   @override
@@ -569,8 +570,14 @@ class MoodDetailState extends State<MoodDetail> {
 
   MoodDetailState(Record record, double deviceHeight) {
     debugPrint(record.name);
-    header =
-        MoodHeader(record, deviceHeight * 1597.0 / 2584); //golden ratio boys
+    //sliverMaxHeight
+    double heightOfHeader = deviceHeight -
+        (109.0 +
+            (record.link.length > 0
+                ? 38
+                : 0)); //deviceHeight * 1597.0 / 2584 (golden ratio)
+
+    header = MoodHeader(record, heightOfHeader); //golden ratio boys
     title = MoodTitle(record);
     buttons = MoodButtons(record);
     guides = MoodGuides(initialRecord: record);
@@ -614,5 +621,6 @@ class MoodDetailState extends State<MoodDetail> {
   @override
   void dispose() {
     if (kIsWeb) html.window.history.pushState(null, "", "");
+    super.dispose();
   }
 }

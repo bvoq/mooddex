@@ -139,7 +139,14 @@ class _RegisterPageState extends State<RegisterPage> {
                                   Navigator.pushAndRemoveUntil(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) => MoodHome()),
+                                          builder: (context) => MoodHome(
+                                                width: MediaQuery.of(context)
+                                                    .size
+                                                    .width,
+                                                height: MediaQuery.of(context)
+                                                    .size
+                                                    .height,
+                                              )),
                                       (_) => false);
                                   userNameInputController.clear();
                                   emailInputController.clear();
@@ -169,7 +176,14 @@ class _RegisterPageState extends State<RegisterPage> {
                                   Navigator.pushAndRemoveUntil(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) => MoodHome()),
+                                        builder: (context) => MoodHome(
+                                          width:
+                                              MediaQuery.of(context).size.width,
+                                          height: MediaQuery.of(context)
+                                              .size
+                                              .height,
+                                        ),
+                                      ),
                                       (_) => false);
                                   userNameInputController.clear();
                                   emailInputController.clear();
