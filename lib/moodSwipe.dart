@@ -31,7 +31,7 @@ class MoodSwipeState extends State<MoodSwipe> {
   void loadCards(double width, double height) {
     Random rnd = new Random();
     debugPrint("testsofar");
-    if (cards.length < 5) {
+    if (cards.length < 30) {
       double val = rnd.nextDouble();
       debugPrint("loading");
 
@@ -39,7 +39,7 @@ class MoodSwipeState extends State<MoodSwipe> {
           .collection('moods')
           .orderBy('rnd')
           .startAt([val])
-          .limit(5 - cards.length)
+          .limit(30 - cards.length)
           /*
           .where('searchable', isEqualTo: true)
           .limit(1)*/
@@ -56,7 +56,7 @@ class MoodSwipeState extends State<MoodSwipe> {
             if (snap != null) {
               debugPrint(snap.documents.length.toString());
               List<DocumentSnapshot> snaps = snap.documents;
-              for (int i = 0; i < snaps.length && cards.length < 5; ++i) {
+              for (int i = 0; i < snaps.length && cards.length < 30; ++i) {
                 Record record = Record.fromSnapshot(snaps[i]);
                 MoodDetail mood = MoodDetail(
                   key: UniqueKey(),
@@ -93,8 +93,6 @@ class MoodSwipeState extends State<MoodSwipe> {
             return Center(child: CircularProgressIndicator());
           } else {
             return Container(
-              color:
-                  Theme.of(context).scaffoldBackgroundColor.withOpacity(0.98),
               child: Column(
                 children: [
                   CupertinoNavigationBar(
@@ -119,31 +117,41 @@ class MoodSwipeState extends State<MoodSwipe> {
                       alignment: AlignmentDirectional.center,
                       children: List.generate(
                         cards.length,
-                        (i) => Positioned(
-                          top: 40 + 20.0 * i,
-                          child: (i + 1 == cards.length)
-                              ? Dismissible(
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(75),
-                                    child: Container(
-                                        width:
-                                            MediaQuery.of(context).size.width /
-                                                1.5,
-                                        height:
-                                            MediaQuery.of(context).size.height /
-                                                1.5,
-                                        child: cards[cards.length - i - 1]),
-                                  ),
-                                  key: cards[cards.length - i - 1].key,
-                                  onDismissed: (direction) {
-                                    cards.removeAt(cards.length - i - 1);
-                                    loadCards(
-                                      MediaQuery.of(context).size.width,
-                                      MediaQuery.of(context).size.height,
-                                    );
-                                  },
-                                )
-                              : ClipRRect(
+                        (i) => AnimatedPositioned(
+                          top: 100 - 60.0 * (cards.length - i - 1),
+                          duration: Duration(milliseconds: 100),
+                          curve: Curves.easeInOutCubic,
+                          child: Dismissible(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(75),
+                              child: AnimatedContainer(
+                                  width:
+                                      MediaQuery.of(context).size.width / 1.5,
+                                  /*max(
+                                      MediaQuery.of(context).size.width / 1.5 -
+                                          (cards.length - i - 1) * 100,
+                                      MediaQuery.of(context).size.width / 1.5 -
+                                          3 * 100),
+                                          */
+                                  curve: Curves.bounceInOut,
+                                  height:
+                                      MediaQuery.of(context).size.height / 1.5,
+                                  duration: Duration(milliseconds: 100),
+                                  child: cards[cards.length - i - 1]),
+                            ),
+                            key: cards[cards.length - i - 1].key,
+                            onDismissed: (direction) {
+                              setState(() {
+                                cards.removeAt(cards.length - i - 1);
+                              });
+                              if (cards.length < 5)
+                                loadCards(
+                                  MediaQuery.of(context).size.width,
+                                  MediaQuery.of(context).size.height,
+                                );
+                            },
+                          ),
+                          /*: ClipRRect(
                                   borderRadius: BorderRadius.circular(75),
                                   child: Container(
                                       width: MediaQuery.of(context).size.width /
@@ -152,7 +160,7 @@ class MoodSwipeState extends State<MoodSwipe> {
                                           MediaQuery.of(context).size.height /
                                               1.5,
                                       child: cards[cards.length - i - 1]),
-                                ),
+                                ),*/
                         ),
                       ),
                     ),
