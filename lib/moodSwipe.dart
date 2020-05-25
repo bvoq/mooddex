@@ -60,7 +60,8 @@ class MoodSwipeState extends State<MoodSwipe> {
                   MoodDetail mood = MoodDetail(
                     key: UniqueKey(),
                     initialRecord: record,
-                    deviceHeight: height / 1.5,
+                    deviceHeight: height / 1.45,
+                    inSwipe: true,
                   );
                   cards.add(mood);
                 }
@@ -100,24 +101,41 @@ class MoodSwipeState extends State<MoodSwipe> {
     for (int i = displayCards.length; i < cards.length; ++i) {
       displayCards.add(AnimatedPositioned(
         key: cards[qs - i - 1].key,
-        top: 100 - 60.0 * (qs - i - 1),
+        top: 60 - 20.0 * (qs - i - 1),
         duration: Duration(milliseconds: 100),
         curve: Curves.easeInOutCubic,
         child: Dismissible(
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(75),
+            borderRadius:
+                BorderRadius.circular(MediaQuery.of(context).size.width / 20),
             child: AnimatedOpacity(
               // If the widget is visible, animate to 0.0 (invisible).
               // If the widget is hidden, animate to 1.0 (fully visible).
               opacity: qs - i > 3 ? 0.0 : 1.0,
               duration: Duration(milliseconds: 500),
               child: AnimatedContainer(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(40),
+                        topRight: Radius.circular(40),
+                        bottomLeft: Radius.circular(40),
+                        bottomRight: Radius.circular(40)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey,
+                        spreadRadius: 10,
+                        blurRadius: 5,
+                        offset: Offset(0, 3), // changes position of shadow
+                      ),
+                    ],
+                  ),
                   width:
                       //MediaQuery.of(context).size.width / 1.5,
                       max(
-                          MediaQuery.of(context).size.width / 1.5 -
-                              (qs - i - 1) * 70,
-                          MediaQuery.of(context).size.width / 1.5 - 2 * 70),
+                          min(512.0, MediaQuery.of(context).size.width / 1.1) -
+                              (qs - i - 1) * 30,
+                          min(512.0, MediaQuery.of(context).size.width / 1.1) -
+                              2 * 30),
                   curve: Curves.bounceInOut,
                   height: MediaQuery.of(context).size.height / 1.5,
                   duration: Duration(milliseconds: 100),

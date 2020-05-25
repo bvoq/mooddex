@@ -62,8 +62,10 @@ void changeToMoodDetail(BuildContext context, Record record) {
       context,
       MaterialPageRoute(
         builder: (context) => MoodDetail(
-            initialRecord: record,
-            deviceHeight: MediaQuery.of(context).size.height),
+          initialRecord: record,
+          deviceHeight: MediaQuery.of(context).size.height,
+          inSwipe: false,
+        ),
       ));
 }
 
@@ -119,7 +121,10 @@ class MoodHeader extends SliverPersistentHeaderDelegate {
 
 class MoodTitle extends SliverPersistentHeaderDelegate {
   final Record record;
-  MoodTitle(Record record) : record = record;
+  final double titleHeight;
+  MoodTitle(Record record, double titleHeight)
+      : record = record,
+        titleHeight = titleHeight;
 
   @override
   Widget build(
@@ -248,10 +253,10 @@ class MoodTitle extends SliverPersistentHeaderDelegate {
   bool shouldRebuild(SliverPersistentHeaderDelegate _) => true;
 
   @override
-  double get maxExtent => 109.0 + (record.link.length > 0 ? 38 : 0);
+  double get maxExtent => titleHeight;
 
   @override
-  double get minExtent => 109.0 + (record.link.length > 0 ? 38 : 0);
+  double get minExtent => titleHeight;
 }
 
 class MoodButtons extends SliverPersistentHeaderDelegate {
@@ -549,14 +554,18 @@ class MoodGuidesState extends State<MoodGuides> {
 class MoodDetail extends StatefulWidget {
   final Record initialRecord;
   final double deviceHeight;
-  Key key;
+  final bool inSwipe;
+  final Key key;
   MoodDetail(
-      {this.key, @required this.initialRecord, @required this.deviceHeight})
+      {this.key,
+      @required this.initialRecord,
+      @required this.deviceHeight,
+      @required this.inSwipe})
       : super(key: key);
 
   @override
   State<StatefulWidget> createState() =>
-      MoodDetailState(initialRecord, deviceHeight);
+      MoodDetailState(initialRecord, deviceHeight, inSwipe);
 }
 
 class MoodDetailState extends State<MoodDetail> {
@@ -568,17 +577,18 @@ class MoodDetailState extends State<MoodDetail> {
   MoodGuides guides;
   Record record;
 
-  MoodDetailState(Record record, double deviceHeight) {
+  MoodDetailState(Record record, double deviceHeight, bool inSwipe) {
     debugPrint(record.name);
     //sliverMaxHeight
-    double heightOfHeader = deviceHeight -
-        (109.0 +
-            (record.link.length > 0
-                ? 38
-                : 0)); //deviceHeight * 1597.0 / 2584 (golden ratio)
+
+    double heightOfTitle =
+        109.0 + (record.link.length > 0 ? (inSwipe ? 2 * 38.0 : 38.0) : 0.0);
+    double heightOfHeader = deviceHeight - heightOfTitle;
+
+    //deviceHeight * 1597.0 / 2584 (golden ratio)
 
     header = MoodHeader(record, heightOfHeader); //golden ratio boys
-    title = MoodTitle(record);
+    title = MoodTitle(record, heightOfTitle);
     buttons = MoodButtons(record);
     guides = MoodGuides(initialRecord: record);
     record = record;
@@ -590,7 +600,7 @@ class MoodDetailState extends State<MoodDetail> {
     debugPrint("Votes: " + newRecord.votes.toString());
     record = newRecord;
     //header = MoodHeader(record);
-    title = MoodTitle(record);
+    title = MoodTitle(record, title.titleHeight);
     buttons = MoodButtons(record);
     guides = MoodGuides(initialRecord: record);
     setState(() => {});
