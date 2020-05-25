@@ -616,7 +616,7 @@ class MoodDetailState extends State<MoodDetail> {
                 pinned: true, floating: false, delegate: title),
             SliverPersistentHeader(
                 pinned: false, floating: false, delegate: buttons),
-            //guides,
+            guides,
           ],
         ));
   }

@@ -302,7 +302,7 @@ class MoodHomeState extends State<MoodHome> {
       body: bottomNavigationIndex == 0
           ? CustomScrollView(
               slivers: <Widget>[
-                CupertinoSliverNavigationBar(largeTitle: Text("My Moods")),
+                CupertinoSliverNavigationBar(largeTitle: Text("Mood Dex")),
                 myMoods,
               ],
             )
@@ -398,7 +398,7 @@ class MoodHomeState extends State<MoodHome> {
         //type: BottomNavigationBarType.fixed,
         items: [
           BottomNavigationBarItem(
-              icon: Icon(Icons.art_track), title: Text('My Moods')),
+              icon: Icon(Icons.art_track), title: Text('Mood Dex')),
           BottomNavigationBarItem(
               icon: Icon(Icons.burst_mode), title: Text('Discover')),
           BottomNavigationBarItem(
