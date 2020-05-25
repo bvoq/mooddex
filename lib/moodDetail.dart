@@ -360,7 +360,7 @@ class MoodGuidesState extends State<MoodGuides> {
       stream: widget.initialRecord.reference
           .collection("guides")
           .orderBy("hf")
-          .limit(100)
+          .limit(20)
           .snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData)
@@ -598,6 +598,9 @@ class MoodDetailState extends State<MoodDetail> {
 
   @override
   Widget build(BuildContext context) {
+    //return Container(
+    //    child: Center(child: Text(widget.initialRecord.collectionName)));
+
     return Scaffold(
         extendBodyBehindAppBar: true,
         appBar: AppBar(
@@ -613,7 +616,7 @@ class MoodDetailState extends State<MoodDetail> {
                 pinned: true, floating: false, delegate: title),
             SliverPersistentHeader(
                 pinned: false, floating: false, delegate: buttons),
-            guides,
+            //guides,
           ],
         ));
   }

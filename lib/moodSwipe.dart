@@ -3,9 +3,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'moodReport.dart';
 import 'moodAdd.dart';
 import 'record.dart';
 import 'moodDetail.dart';
@@ -21,26 +19,27 @@ class MoodSwipe extends StatefulWidget {
 }
 
 class MoodSwipeState extends State<MoodSwipe> {
-  List<MoodDetail> cards = [];
+  List<MoodDetail> cards = List<MoodDetail>();
+  //Queue<Widget> cardDisplay = Queue<Widget>(); // split into MoodDetail and Record and always just transfer one from mooddetail to record!!
+
+  List<Widget> displayCards = [];
   bool initialLoad;
   Future<bool> initialLoadF;
 
   MoodSwipeState(double width, double height) {
-    loadCards(width, height, 10);
+    loadCards(width, height, 6, true);
   }
 
-  void loadCards(double width, double height, int count) {
+  void loadCards(double width, double height, int count, bool refresh) {
     Random rnd = new Random();
-    debugPrint("testsofar");
     if (cards.length < count) {
       double val = rnd.nextDouble();
-      debugPrint("loading");
 
       Firestore.instance
           .collection('moods')
           .orderBy('rnd')
           .startAt([val])
-          .limit(count - cards.length)
+          .limit(count - cards.length + 2)
           /*
           .where('searchable', isEqualTo: true)
           .limit(1)*/
@@ -52,8 +51,6 @@ class MoodSwipeState extends State<MoodSwipe> {
             return;
           })
           .then((QuerySnapshot snap) {
-            debugPrint("pog: " + snap.toString());
-
             if (snap != null) {
               debugPrint(snap.documents.length.toString());
               List<DocumentSnapshot> snaps = snap.documents;
@@ -68,7 +65,7 @@ class MoodSwipeState extends State<MoodSwipe> {
                   cards.add(mood);
                 }
               }
-              loadCards(width, height, count);
+              loadCards(width, height, count, refresh);
               if (snaps.length < 1) {
                 initialLoad = false;
                 initialLoadF = Future<bool>.value(false);
@@ -81,18 +78,78 @@ class MoodSwipeState extends State<MoodSwipe> {
             }
           });
     } else {
-      setState(() {});
+      debugPrint("setstater " + cards.length.toString());
+      matchCards();
+      if (refresh) setState(() {});
+      for (int i = 0; i < displayCards.length; ++i) {
+        cards[i].createState();
+      }
+      debugPrint("LOADED CARDS " +
+          displayCards.length.toString() +
+          " " +
+          cards.length.toString());
     }
     initialLoad = true;
     initialLoadF = Future<bool>.value(true);
   }
 
+  void matchCards() {
+    int qs = cards.length;
+    displayCards = List<Widget>();
+    bool moreCards = (displayCards.length != cards.length);
+    for (int i = displayCards.length; i < cards.length; ++i) {
+      displayCards.add(AnimatedPositioned(
+        key: cards[qs - i - 1].key,
+        top: 100 - 60.0 * (qs - i - 1),
+        duration: Duration(milliseconds: 100),
+        curve: Curves.easeInOutCubic,
+        child: Dismissible(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(75),
+            child: AnimatedOpacity(
+              // If the widget is visible, animate to 0.0 (invisible).
+              // If the widget is hidden, animate to 1.0 (fully visible).
+              opacity: qs - i > 3 ? 0.0 : 1.0,
+              duration: Duration(milliseconds: 500),
+              child: AnimatedContainer(
+                  width:
+                      //MediaQuery.of(context).size.width / 1.5,
+                      max(
+                          MediaQuery.of(context).size.width / 1.5 -
+                              (qs - i - 1) * 70,
+                          MediaQuery.of(context).size.width / 1.5 - 2 * 70),
+                  curve: Curves.bounceInOut,
+                  height: MediaQuery.of(context).size.height / 1.5,
+                  duration: Duration(milliseconds: 100),
+                  child: cards[qs - i - 1]),
+            ),
+          ),
+          key: cards[qs - i - 1].key,
+          onDismissed: (direction) {
+            debugPrint("remove " + (qs - i - 1).toString());
+            cards.removeAt(qs - i - 1);
+            displayCards.removeAt(qs - i - 1);
+            matchCards();
+            setState(() {});
+            if (cards.length < 7) {
+              loadCards(MediaQuery.of(context).size.width,
+                  MediaQuery.of(context).size.height, 20, false);
+            }
+          },
+        ),
+      ));
+    }
+  }
+
   @override
   build(BuildContext context) {
-    return FutureBuilder(
+    debugPrint("building " + cards.length.toString());
+    Widget fb = FutureBuilder(
         future: initialLoadF,
         builder: (context, snapshot) {
+          int qs = min(3, cards.length);
           if (cards.length == 0) {
+            debugPrint("actually circulating");
             return Center(child: CircularProgressIndicator());
           } else {
             return Container(
@@ -129,62 +186,7 @@ class MoodSwipeState extends State<MoodSwipe> {
                     height: MediaQuery.of(context).size.height - 120,
                     child: Stack(
                       alignment: AlignmentDirectional.center,
-                      children: List.generate(
-                        cards.length,
-                        (i) => AnimatedPositioned(
-                          top: 100 - 60.0 * (cards.length - i - 1),
-                          duration: Duration(milliseconds: 100),
-                          curve: Curves.easeInOutCubic,
-                          child: Dismissible(
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(75),
-                              child: AnimatedOpacity(
-                                // If the widget is visible, animate to 0.0 (invisible).
-                                // If the widget is hidden, animate to 1.0 (fully visible).
-                                opacity: i + 3 < cards.length ? 0.0 : 1.0,
-                                duration: Duration(milliseconds: 500),
-                                child: AnimatedContainer(
-                                    width:
-                                        //MediaQuery.of(context).size.width / 1.5,
-                                        max(
-                                            MediaQuery.of(context).size.width /
-                                                    1.5 -
-                                                (cards.length - i - 1) * 70,
-                                            MediaQuery.of(context).size.width /
-                                                    1.5 -
-                                                2 * 70),
-                                    curve: Curves.bounceInOut,
-                                    height: MediaQuery.of(context).size.height /
-                                        1.5,
-                                    duration: Duration(milliseconds: 100),
-                                    child: cards[cards.length - i - 1]),
-                              ),
-                            ),
-                            key: cards[cards.length - i - 1].key,
-                            onDismissed: (direction) {
-                              setState(() {
-                                cards.removeAt(cards.length - i - 1);
-                              });
-                              if (cards.length < 5)
-                                loadCards(
-                                  MediaQuery.of(context).size.width,
-                                  MediaQuery.of(context).size.height,
-                                  30,
-                                );
-                            },
-                          ),
-                          /*: ClipRRect(
-                                  borderRadius: BorderRadius.circular(75),
-                                  child: Container(
-                                      width: MediaQuery.of(context).size.width /
-                                          1.5,
-                                      height:
-                                          MediaQuery.of(context).size.height /
-                                              1.5,
-                                      child: cards[cards.length - i - 1]),
-                                ),*/
-                        ),
-                      ),
+                      children: displayCards,
                     ),
                   ),
                 ],
@@ -192,6 +194,8 @@ class MoodSwipeState extends State<MoodSwipe> {
             );
           }
         });
+    debugPrint("end building " + cards.length.toString());
+    return fb;
   }
 }
 
