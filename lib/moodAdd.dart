@@ -98,7 +98,18 @@ class MoodAddState extends State<MoodAdd> {
         key: _loginFormKey,
         child: Column(
           children: [
-            CupertinoNavigationBar(middle: Text("Add mood")),
+            CupertinoNavigationBar(
+              middle: Text("Add mood"),
+              leading: GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Container(
+                  child: Icon(
+                    CupertinoIcons.back,
+                    color: CupertinoColors.black,
+                  ),
+                ),
+              ),
+            ),
 
             Padding(
                 padding:
