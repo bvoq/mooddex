@@ -1,0 +1,8 @@
+Kevin De Keyser is the sole developer of Mood Dex, residing in Seehäusernmatte 19, 6208 Oberkirch, Switzerland.
+For particular inquiries reach him through the app by pressing give feedback.
+
+The app Mood Dex records all data within a Firebase Database and a Firebase Storage server. The permissions are set in such a way that all moods the user adds to his Mood Dex are stored privately unless they share their account with other users. The username, moods and mood guides which are created by users are publicly available through the app. Mood guides can be deleted, however moods themselves cannot be removed since other people will have added these guides to their list of moods. If you have particular inquiries press down on the mood banner or the mood guide and click report.
+
+In addition statistics among all users are publicly visible, like the average rating of a mood. If user ratings are removed they are also removed from the statistics.
+
+Personal data can be shared confidentially with ad-platforms like google ads.
