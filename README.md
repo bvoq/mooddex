@@ -1,16 +1,6 @@
-# mooddex_client
+# Mood Dex
 
-A new Flutter project.
+Mood Dex comes from the realization that experiencing interesting moods requires work, just like anything else. 
+To facilitate this, Mood Dex is an app for keeping track of your experiences and for discovering and sharing new ones with friends. Gotta catch 'em all. In order to properly experience a mood, a good introduction and motivation are vital. With mood guides, you not only rate and share your opinion on a mood but also try to convey how to best experience a mood.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+For more see: https://mood-dex.com
