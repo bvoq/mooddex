@@ -107,7 +107,7 @@ class MoodReportState extends State<MoodReport> {
                         " " +
                         _reportController.text);
                     int i = (new Random()).nextInt(100000);
-                    await Firestore.instance.collection("reports").add({
+                    await FirebaseFirestore.instance.collection("reports").add({
                       "au": globalState.userName,
                       "uid": globalState.user.uid,
                       "rt": widget.reportType,

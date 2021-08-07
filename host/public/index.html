@@ -1,88 +1,55 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta content="IE=Edge" http-equiv="X-UA-Compatible">
+		<meta name="description" content="A new Flutter project.">
 
-  <!-- Basic Page Needs
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <meta charset="utf-8">
-  <title>KanjiConstruct</title>
-  <meta name="description" content="">
-  <meta name="author" content="">
+		<!-- iOS meta tags & icons -->
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<meta name="apple-mobile-web-app-title" content="mooddex">
+		<link rel="apple-touch-icon" href="icons/Icon-192.png">
 
-  <!-- Mobile Specific Metas
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+		<!-- Favicon -->
+		<link rel="shortcut icon" type="image/png" href="favicon.png"/>
 
-  <!-- FONT
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+		<title>mooddex</title>
+		<link rel="manifest" href="manifest.json">
+	</head>
+	<body>
+		<!-- This script installs service_worker.js to provide PWA functionality to
+	  application. For more information, see:
+	  https://developers.google.com/web/fundamentals/primers/service-workers -->
+	  <script>
+		  if ('serviceWorker' in navigator) {
+			  window.addEventListener('load', function () {
+				  navigator.serviceWorker.register('flutter_service_worker.js');
+			  });
+		  }
+	  </script>
+	  <!-- The core Firebase JS SDK is always required and must be listed first -->
+	  <script src="https://www.gstatic.com/firebasejs/7.14.2/firebase-app.js"></script>
+	  <script src="https://www.gstatic.com/firebasejs/7.14.2/firebase-auth.js"></script>
+	  <script src="https://www.gstatic.com/firebasejs/7.14.2/firebase-analytics.js"></script>
+	  <script src="https://www.gstatic.com/firebasejs/7.14.2/firebase-firestore.js"></script>
 
-  <!-- CSS
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <link rel="stylesheet" href="css/normalize.css">
-  <link rel="stylesheet" href="css/skeleton.css">
-
-  <!-- Favicon
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <link rel="icon" type="image/png" href="images/favicon.png">
-
-</head>
-<body>
-	
-	<style>.blink_text {
-
-    animation:1s blinker linear infinite;
-    -webkit-animation:1s blinker linear infinite;
-    -moz-animation:1s blinker linear infinite;
-
-     color: red;
-    }
-
-    @-moz-keyframes blinker {  
-     0% { opacity: 1.0; }
-     50% { opacity: 0.0; }
-     100% { opacity: 1.0; }
-     }
-
-    @-webkit-keyframes blinker {  
-     0% { opacity: 1.0; }
-     50% { opacity: 0.0; }
-     100% { opacity: 1.0; }
-     }
-
-    @keyframes blinker {  
-     0% { opacity: 1.0; }
-     50% { opacity: 0.0; }
-     100% { opacity: 1.0; }
-     }</style>
-
-  <!-- Primary Page Layout
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-  <div class="container">
-    <div class="row">
-      <div class="one-half column" style="margin-top: 25%">
-	<img src="./mooddex.jpg" style="width: 100%; height: auto;">
-        <h4>Mood Dex</h4>
-        <p>
-		Mood Dex comes from the realization that experiencing interesting moods requires work, just like anything else. <br>
-
-		To facilitate this, Mood Dex is an app for keeping track of your experiences and for discovering and sharing new ones with friends. Gotta catch 'em all.
-
-In order to properly experience a mood, a good introduction and motivation are vital. With mood guides, you not only rate and share your opinion on a mood but also try to convey how to best experience a mood.
-	</p>
-	<p>
-
-	<a href='./privacypolicy.txt'>Text version</a>
-	<br>
-
-
-	</p>
-	</div>
-    </div>
-  </div>
-
-<!-- End Document
-  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-</body>
+	   <script>
+		   // Your web app's Firebase configuration
+		   var firebaseConfig = {
+			   apiKey: "AIzaSyDvyAB3ESWt5A4YtqI1s5B8pJwwW-ly5-Q",
+			   authDomain: "mooddex-b9ca6.firebaseapp.com",
+			   databaseURL: "https://mooddex-b9ca6.firebaseio.com",
+			   projectId: "mooddex-b9ca6",
+			   storageBucket: "mooddex-b9ca6.appspot.com",
+			   messagingSenderId: "266792360774",
+			   appId: "1:266792360774:web:a7daa1c6dd5dec420fa347",
+			   measurementId: "G-K3GVC78L7R"
+		   };
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+firebase.analytics();
+	   </script>
+	   <script src="main.dart.js" type="application/javascript"></script>
+	</body>
 </html>
-

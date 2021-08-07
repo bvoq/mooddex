@@ -19,51 +19,48 @@ class _SplashPageState extends State<SplashPage> {
 
   @override
   initState() {
-    FirebaseAuth.instance.currentUser().then((currentUser) {
-      if (currentUser != null) {
-        debugPrint("not null");
-        neverSignedIn = false;
-        setState(() {});
-        globalState.setUser(currentUser).then((glsuccess) {
-          debugPrint("setuserstate: " + glsuccess.toString());
-          if (glsuccess) {
-            Firestore.instance
-                .collection("users")
-                .document(currentUser.uid)
-                .get()
-                .then((DocumentSnapshot result) {
-              Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => MoodHome(
-                            width: MediaQuery.of(context).size.width,
-                            height: MediaQuery.of(context).size.height,
-                          )));
-              success = true;
-            }).catchError((err) => setState(() {
-                      success = false;
-                    }));
-          } else {
-            setState(() {
-              success = false;
-            });
-          }
-        }).catchError((error) {
+    User currentUser = FirebaseAuth.instance.currentUser;
+
+    if (currentUser != null) {
+      debugPrint("not null");
+      neverSignedIn = false;
+      setState(() {});
+      globalState.setUser(currentUser).then((glsuccess) {
+        debugPrint("setuserstate: " + glsuccess.toString());
+        if (glsuccess) {
+          FirebaseFirestore.instance
+              .collection("users")
+              .doc(currentUser.uid)
+              .get()
+              .then((DocumentSnapshot result) {
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => MoodHome(
+                          width: MediaQuery.of(context).size.width,
+                          height: MediaQuery.of(context).size.height,
+                        )));
+            success = true;
+          }).catchError((err) => setState(() {
+                    success = false;
+                  }));
+        } else {
           setState(() {
             success = false;
           });
-        });
-      } else {
-        neverSignedIn = true;
+        }
+      }).catchError((error) {
         setState(() {
-          neverSignedIn = true;
+          success = false;
         });
-      }
-    }).catchError((err) {
-      setState(() {
-        success = false;
       });
-    });
+    } else {
+      neverSignedIn = true;
+      setState(() {
+        neverSignedIn = true;
+      });
+    }
+
     super.initState();
   }
 
@@ -115,15 +112,15 @@ class _SplashPageState extends State<SplashPage> {
                             //create an anonymous user
                             debugPrint("ok user");
                             FirebaseAuth.instance.signInAnonymously().then(
-                                (AuthResult res) => globalState
+                                (UserCredential res) => globalState
                                         .registerUser(res.user, "anonymous", "")
                                         .then((val) {
                                       debugPrint("registered user");
                                       globalState.setUser(res.user).then((val) {
                                         debugPrint("set user");
-                                        Firestore.instance
+                                        FirebaseFirestore.instance
                                             .collection("users")
-                                            .document(res.user.uid)
+                                            .doc(res.user.uid)
                                             .get()
                                             .then((DocumentSnapshot result) {
                                           debugPrint("final get request");

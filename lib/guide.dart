@@ -27,5 +27,5 @@ class Guide {
         helpful = map["hf"],
         ts = map["ts"];
 
-  Guide.fromSnapshot(DocumentSnapshot snapshot) : this.fromMap(snapshot.data);
+  Guide.fromSnapshot(DocumentSnapshot snapshot) : this.fromMap(snapshot.data());
 }

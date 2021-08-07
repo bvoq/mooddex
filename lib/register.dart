@@ -120,7 +120,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         try {
                           if (globalState.user.isAnonymous) {
                             AuthCredential credential =
-                                EmailAuthProvider.getCredential(
+                                EmailAuthProvider.credential(
                                     email: emailInputController.text,
                                     password: pwdInputController.text);
 

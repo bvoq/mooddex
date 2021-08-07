@@ -35,7 +35,7 @@ class MoodSwipeState extends State<MoodSwipe> {
     if (cards.length < count) {
       double val = rnd.nextDouble();
 
-      Firestore.instance
+      FirebaseFirestore.instance
           .collection('moods')
           .orderBy('rnd')
           .startAt([val])
@@ -43,17 +43,17 @@ class MoodSwipeState extends State<MoodSwipe> {
           /*
           .where('searchable', isEqualTo: true)
           .limit(1)*/
-          .getDocuments()
+          .get()
           .catchError((onError) {
             debugPrint("error loading cards");
             initialLoad = false;
             initialLoadF = Future<bool>.value(false);
-            return;
+            //return;
           })
           .then((QuerySnapshot snap) {
             if (snap != null) {
-              debugPrint(snap.documents.length.toString());
-              List<DocumentSnapshot> snaps = snap.documents;
+              debugPrint(snap.docs.length.toString());
+              List<DocumentSnapshot> snaps = snap.docs;
               for (int i = 0; i < snaps.length && cards.length < count; ++i) {
                 Record record = Record.fromSnapshot(snaps[i]);
                 if (record.searchable) {
@@ -179,7 +179,18 @@ class MoodSwipeState extends State<MoodSwipe> {
                       onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => MoodAdd(query: ""),
+                            builder: (context) => MoodAdd(
+                                query: "",
+                                callback: () {
+                                  debugPrint("Called callback!!!");
+                                  setState(() {
+                                    cards = [];
+                                    displayCards = [];
+                                  });
+                                  loadCards(
+                                      widget.width, widget.height, 6, true);
+                                  setState(() {});
+                                }),
                           )),
                       child: Icon(
                         CupertinoIcons.add,
@@ -216,44 +227,3 @@ class MoodSwipeState extends State<MoodSwipe> {
     return fb;
   }
 }
-
-/*
-List<Widget> _getMatchCard() { 
-    List<MatchCard> cards = new List(); 
-    cards.add(MatchCard(255, 0, 0, 10)); 
-    cards.add(MatchCard(0, 255, 0, 20)); 
-    cards.add(MatchCard(0, 0, 255, 30)); 
-    List<Widget> cardList = new List(); 
-   for (int x = 0; x < 3; x++) { 
-     cardList.add(Positioned( 
-       top: cards[x].margin, 
-       child: Draggable( 
-          onDragEnd: (drag){ 
-            _removeCard(x); 
-          }, 
-       childWhenDragging: Container(), 
-       feedback: Card( 
-         elevation: 12, 
-         color: Color.fromARGB(255, cards[x].redColor, cards[x].greenColor, cards[x].blueColor), 
-         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)), 
-         child: Container( 
-            width: 240, 
-            height: 300, 
-            ), 
-          ), 
-       child: Card( 
-         elevation: 12, 
-         color: Color.fromARGB(255, cards[x].redColor, cards[x].greenColor, cards[x].blueColor), 
-         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)), 
-         child: Container( 
-           width: 240, 
-           height: 300, 
-          ), 
-         ), 
-       ), 
-     )
-   ); 
-  } 
-  return cardList;
-}
-*/

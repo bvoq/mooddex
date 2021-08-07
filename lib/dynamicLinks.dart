@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:mooddex_client/moodDetail.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:share/share.dart';
-import 'package:universal_html/prefer_universal/html.dart' as html;
+import "package:universal_html/html.dart" as html;
+//import 'package:universal_html/prefer_universal/html.dart' as html;
 
 import 'globalState.dart';
 import 'record.dart';

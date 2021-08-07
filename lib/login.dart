@@ -81,7 +81,7 @@ class _LoginPageState extends State<LoginPage> {
                     onPressed: () async {
                       if (_loginFormKey.currentState.validate()) {
                         try {
-                          AuthResult authRes = await FirebaseAuth.instance
+                          UserCredential authRes = await FirebaseAuth.instance
                               .signInWithEmailAndPassword(
                                   email: emailInputController.text,
                                   password: pwdInputController.text)
@@ -128,8 +128,7 @@ class _LoginPageState extends State<LoginPage> {
                             //    .collection("users")
                             //    .document(authRes.user.uid)
                             //    .get();
-                            FirebaseUser u =
-                                await FirebaseAuth.instance.currentUser();
+                            User u = FirebaseAuth.instance.currentUser;
                             await globalState.setUser(u);
                             debugPrint("Hopefully not null: " + u.email);
                             Navigator.pop(context);

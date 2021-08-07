@@ -48,7 +48,8 @@ Widget _addNewMood(BuildContext context, String query) {
                     onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => MoodAdd(query: query),
+                          builder: (context) =>
+                              MoodAdd(query: query, callback: () {}),
                         )))),
           ],
         ),
@@ -86,7 +87,7 @@ Widget _searchSuggestions(String query) {
         .toUpperCase()
         .toLowerCase()); // add full query for special search strings
     return StreamBuilder<QuerySnapshot>(
-      stream: Firestore.instance
+      stream: FirebaseFirestore.instance
           .collection('moods')
           .where('searchable', isEqualTo: true)
           .where('search_terms', arrayContainsAny: searchTerms)
@@ -94,7 +95,7 @@ Widget _searchSuggestions(String query) {
           .snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) return LinearProgressIndicator();
-        return _buildList(context, snapshot.data.documents, query);
+        return _buildList(context, snapshot.data.docs, query);
       },
     );
   }

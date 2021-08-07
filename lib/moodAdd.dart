@@ -1,18 +1,21 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'globalState.dart';
 import 'moodDetail.dart';
+import 'moodHome.dart';
 import 'record.dart';
 
 class MoodAdd extends StatefulWidget {
   final String query;
-  const MoodAdd({Key key, @required this.query}) : super(key: key);
+  final Function() callback;
+  const MoodAdd({Key key, @required this.query, @required this.callback})
+      : super(key: key);
   @override
   State<StatefulWidget> createState() => MoodAddState(this.query);
 }
@@ -23,9 +26,10 @@ class MoodAddState extends State<MoodAdd> {
   TextEditingController _nameController;
   TextEditingController _linkController;
   ImageChooser _imageChooser;
-  File _imageFile;
+  XFile _imageFile;
   bool triedSubmittingButFailed = false;
   int searchable = 0;
+  bool submitting = false;
 
   MoodAddState(String queryName) {
     _nameController = TextEditingController(text: queryName);
@@ -67,6 +71,13 @@ class MoodAddState extends State<MoodAdd> {
           globalState.addRating(r, 0, 0).then((vo) {
             //r.loadImageFromFirebase().then((void v) {
             Navigator.pop(context);
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => MoodHome(
+                          width: MediaQuery.of(context).size.width,
+                          height: MediaQuery.of(context).size.height,
+                        )));
             Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -77,7 +88,10 @@ class MoodAddState extends State<MoodAdd> {
                         )));
           });
         } else {}
+      }).catchError((onError) {
+        triedSubmittingButFailed = true;
       });
+      debugPrint('success??');
       //add zero ratings
     } else {
       // just ignore the request, no image selected yet..
@@ -90,7 +104,7 @@ class MoodAddState extends State<MoodAdd> {
 
     _imageChooser = ImageChooser(
       errorColor: triedSubmittingButFailed ? Colors.red : Colors.black,
-      onImageSelect: (File returnedImageFile) {
+      onImageSelect: (XFile returnedImageFile) {
         _imageFile = returnedImageFile;
       },
     );
@@ -170,13 +184,19 @@ class MoodAddState extends State<MoodAdd> {
             Spacer(flex: 5),
             CupertinoDialogAction(
               isDefaultAction: true,
-              child: new Text("Add mood"),
+              child: !submitting
+                  ? new Text("Add mood")
+                  : // Center(child: const CircularProgressIndicator()),
+                  Center(child: LinearProgressIndicator()),
               onPressed: () async {
                 if (_loginFormKey.currentState.validate()) {
+                  setState(() {
+                    submitting = true;
+                  });
                   publishWidgetAndUpdateScreen(context);
+                  widget.callback();
                 }
                 triedSubmittingButFailed = true;
-                setState(() => {});
               },
             ),
             Spacer(flex: 1),
@@ -188,7 +208,7 @@ class MoodAddState extends State<MoodAdd> {
   }
 }
 
-typedef ImageCallback = void Function(File imageFile);
+typedef ImageCallback = void Function(XFile imageFile);
 
 class ImageChooser extends StatefulWidget {
   ImageChooser({Key key, this.onImageSelect, this.errorColor})
@@ -203,7 +223,7 @@ class ImageChooser extends StatefulWidget {
 }
 
 class ImageChooserState extends State<ImageChooser> {
-  File _imageFile;
+  XFile _imageFile;
   dynamic _pickImageError;
   bool isVideo = false;
   //VideoPlayerController _controller;
@@ -213,7 +233,10 @@ class ImageChooserState extends State<ImageChooser> {
   final TextEditingController maxHeightController = TextEditingController();
   final TextEditingController qualityController = TextEditingController();
 
-  File getImageFile() {
+  //!TODO final _picker = ImagePicker();
+  final _picker = ImagePicker();
+
+  XFile getImageFile() {
     return _imageFile; //returns null if not yet chosen!
   }
 
@@ -223,11 +246,12 @@ class ImageChooserState extends State<ImageChooser> {
     int quality = 80; //null;
 
     try {
-      _imageFile = await ImagePicker.pickImage(
+      XFile _pickedImageFile = await _picker.pickImage(
           source: source,
           maxWidth: maxWidth,
           maxHeight: maxHeight,
           imageQuality: quality);
+      _imageFile = _pickedImageFile; //File(_pickedImageFile.path);
       widget.onImageSelect(_imageFile);
       setState(() {});
     } catch (e) {
@@ -256,7 +280,9 @@ class ImageChooserState extends State<ImageChooser> {
             maxHeight: 235,
             maxWidth: MediaQuery.of(context).size.width,
           ),
-          child: Image.file(_imageFile, fit: BoxFit.cover));
+          child: kIsWeb
+              ? Image.network(_imageFile.path, fit: BoxFit.cover)
+              : Image.file(File(_imageFile.path), fit: BoxFit.cover));
     } else if (_pickImageError != null) {
       return Text(
         'Pick image error: $_pickImageError',
@@ -273,7 +299,7 @@ class ImageChooserState extends State<ImageChooser> {
   }
 
   Future<void> retrieveLostData() async {
-    final LostDataResponse response = await ImagePicker.retrieveLostData();
+    final LostDataResponse response = await _picker.retrieveLostData();
     if (response.isEmpty) {
       return;
     }
@@ -281,7 +307,7 @@ class ImageChooserState extends State<ImageChooser> {
       if (response.type == RetrieveType.image) {
         isVideo = false;
         setState(() {
-          _imageFile = response.file;
+          _imageFile = XFile(response.file.path);
         });
       }
     } else {
@@ -300,7 +326,7 @@ class ImageChooserState extends State<ImageChooser> {
             _onImageButtonPressed(ImageSource.gallery, context: context);
           },
         ),
-        Platform.isAndroid
+        !kIsWeb && Platform.isAndroid
             ? FutureBuilder<void>(
                 future: retrieveLostData(),
                 builder: (BuildContext context, AsyncSnapshot<void> snapshot) {

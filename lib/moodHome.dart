@@ -377,16 +377,6 @@ class MoodHomeState extends State<MoodHome> {
                       ),
                     )
                   : Container(),
-      /*
-      floatingActionButton: FloatingActionButton(
-        isExtended: true,
-        mini: true,
-        child: Icon(Icons.search),
-        onPressed: () => showSearch(
-          context: context,
-          delegate: MoodSearchMaterial(),
-        ),
-      ),*/
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: bottomNavigationIndex,
         onTap: (index) {

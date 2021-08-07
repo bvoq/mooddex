@@ -1,2 +1,4 @@
 build/
+.dart_tool/
+.idea/
 android/key.properties

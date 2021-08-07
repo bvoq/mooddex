@@ -3,7 +3,8 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:universal_html/prefer_universal/html.dart' as html;
+//import 'package:universal_html/prefer_universal/html.dart' as html;
+import 'package:universal_html/html.dart' as html;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mooddex_client/dynamicLinks.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -25,7 +26,7 @@ class EmptyObject {
 void tappedOnMood(BuildContext context, String collectionName) {
   debugPrint("loading mood " + collectionName);
   DocumentReference dr =
-      Firestore.instance.collection('moods').document(collectionName);
+      FirebaseFirestore.instance.collection('moods').doc(collectionName);
   dr.get().then((DocumentSnapshot snapshot) async {
     debugPrint("calling le window history");
     //const state = { 'page_id': 1, 'user_id': 5 }
@@ -83,30 +84,40 @@ class MoodHeader extends SliverPersistentHeaderDelegate {
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
     size = MediaQuery.of(context).size;
-
+    debugPrint("issues are here?? " + record.imageURL);
+    /*
     if (kIsWeb) {
-      return Image.network(record.imageURL,
+      var q = Image.network(record.imageURL,
           width: size.width, height: sliverMaxHeight, fit: BoxFit.cover);
-    } else {
-      return FutureBuilder(
-          future: _loadImageFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              if (snapshot.hasError || record.image == null) {
-                return Center(
-                    child: Text("Image could not be loaded.",
-                        style: TextStyle(color: Colors.grey)));
+      debugPrint("loaded image: " + record.imageURL);
+      return q;
+    } else {*/
+    return FutureBuilder(
+        future: _loadImageFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            if (snapshot.hasError || record.image == null) {
+              return Center(
+                  child: Text("Image could not be loaded.",
+                      style: TextStyle(color: Colors.grey)));
+            } else {
+              if (kIsWeb) {
+                return Image.network(record.imageURL,
+                    width: size.width,
+                    height: sliverMaxHeight,
+                    fit: BoxFit.cover);
               } else {
                 return Image.file(File(record.image),
                     width: size.width,
                     height: sliverMaxHeight,
                     fit: BoxFit.cover);
               }
-            } else {
-              return Center(child: CircularProgressIndicator());
-            } // LinearProgressIndicator();
-          });
-    }
+            }
+          } else {
+            return Center(child: CircularProgressIndicator());
+          } // LinearProgressIndicator();
+        });
+    //}
   }
 
   @override
@@ -157,7 +168,7 @@ class MoodTitle extends SliverPersistentHeaderDelegate {
                         context: context,
                         builder: (BuildContext context) => MoodReport(
                             reportType: "mood",
-                            reportLocation: record.reference.documentID,
+                            reportLocation: record.reference.id,
                             reportDescription:
                                 "What about this mood constitutes an App Store violation?\n"));
                   },
@@ -371,7 +382,7 @@ class MoodGuidesState extends State<MoodGuides> {
         if (!snapshot.hasData)
           return SliverToBoxAdapter(child: LinearProgressIndicator());
 
-        List<DocumentSnapshot> snaps = snapshot.data.documents;
+        List<DocumentSnapshot> snaps = snapshot.data.docs;
         List<Guide> guides = List<Guide>(snaps.length);
         for (int i = 0; i < snaps.length; ++i) {
           guides[i] = Guide.fromSnapshot(snaps[i]);
@@ -527,10 +538,9 @@ class MoodGuidesState extends State<MoodGuides> {
                         context: context,
                         builder: (BuildContext context) => MoodReport(
                             reportType: "comment",
-                            reportLocation:
-                                widget.initialRecord.reference.documentID +
-                                    "_" +
-                                    guide.uid,
+                            reportLocation: widget.initialRecord.reference.id +
+                                "_" +
+                                guide.uid,
                             reportDescription:
                                 "What about this comment constitutes an App Store violation?\n"));
                   },
@@ -578,7 +588,7 @@ class MoodDetailState extends State<MoodDetail> {
   Record record;
 
   MoodDetailState(Record record, double deviceHeight, bool inSwipe) {
-    debugPrint(record.name);
+    debugPrint("Mood Detail State: " + record.name);
     //sliverMaxHeight
 
     double heightOfTitle =

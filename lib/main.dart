@@ -14,10 +14,15 @@
 //import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 import 'splashPage.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  Firebase.initializeApp();
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -27,6 +32,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Mooddex',
       //home: RandomWords(),
+
       initialRoute: '/',
       routes: <String, WidgetBuilder>{
         '/': (BuildContext context) {

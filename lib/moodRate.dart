@@ -70,7 +70,7 @@ class MoodRateState extends State<MoodRate> {
               Expanded(
                 child: SmoothStarRating(
                     allowHalfRating: false,
-                    onRatingChanged: (v) {
+                    onRated: (v) {
                       _ratingForStars = v;
                       rating = _ratingForStars.ceil();
                       setState(() {});
