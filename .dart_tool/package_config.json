@@ -333,7 +333,7 @@
     },
     {
       "name": "share",
-      "rootUri": "file:///Users/kdkdk/Development/flutter/.pub-cache/hosted/pub.dartlang.org/share-2.0.1",
+      "rootUri": "file:///Users/kdkdk/Development/flutter/.pub-cache/hosted/pub.dartlang.org/share-2.0.4",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
@@ -476,7 +476,7 @@
       "languageVersion": "2.2"
     }
   ],
-  "generated": "2021-08-07T21:44:53.428782Z",
+  "generated": "2021-08-13T12:17:33.700212Z",
   "generator": "pub",
   "generatorVersion": "2.14.0-383.0.dev"
 }

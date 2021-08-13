@@ -1,13 +1,11 @@
 import 'dart:io';
 import 'dart:math';
-import 'dart:html' as webFile;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
-import 'package:mime/mime.dart';
 
 import 'package:cross_file/cross_file.dart';
 
