@@ -69,7 +69,8 @@ Future<void> shareMood(Record record) async {
 
 void initDynamicLinks(BuildContext context) async {
   if (kIsWeb) {
-    debugPrint("First web mood: " + html.window.location.href);
+    //debugPrint("First web mood: " + html.window.location.href);
+    //CHANGE WEB
     String fullString = html.window.location.href;
     String collectionNameWithHashtag = "";
     int locationOfQuestionMark = fullString.indexOf("?");
