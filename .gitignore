@@ -3,3 +3,4 @@ build2/
 .dart_tool/
 .idea/
 android/key.properties
+.DS_Store
