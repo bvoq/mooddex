@@ -5,10 +5,6 @@
 // When editing use Cmd+Shift+P => Dart: Use Recommended Settings
 // flutter clean
 
-// I am leaving my job, here's my two weeks notice.
-// I get my work done better remotely and here's why.
-// Could we negotiate in the future about working remotely.
-
 // For adding Google OAuth: https://developers.google.com/identity/sign-in/ios/start-integrating?authuser=2
 
 //import 'package:flutter/foundation.dart';
@@ -18,9 +14,10 @@ import 'package:firebase_core/firebase_core.dart';
 
 import 'splashPage.dart';
 
-void main() {
+void main() async {
+  //Firebase.initializeApp();
   WidgetsFlutterBinding.ensureInitialized();
-  Firebase.initializeApp();
+  await Firebase.initializeApp();
   runApp(MyApp());
 }
 
