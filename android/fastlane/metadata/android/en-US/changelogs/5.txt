@@ -1,0 +1,1 @@
+Fixed a small issue on smaller devices for the swiping resolution.

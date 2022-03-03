@@ -6,4 +6,5 @@ build2/
 .idea/
 android/key.properties
 .DS_Store
+keys/androidfastlanekey.json
 .packages
