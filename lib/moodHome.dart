@@ -388,11 +388,11 @@ class MoodHomeState extends State<MoodHome> {
         //type: BottomNavigationBarType.fixed,
         items: [
           BottomNavigationBarItem(
-              icon: Icon(Icons.art_track), title: Text('Mood Dex')),
+              icon: Icon(Icons.art_track), label: 'Mood Dex'),
           BottomNavigationBarItem(
-              icon: Icon(Icons.burst_mode), title: Text('Discover')),
+              icon: Icon(Icons.burst_mode), label: 'Discover'),
           BottomNavigationBarItem(
-              icon: Icon(Icons.person), title: Text('Profile')),
+              icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
