@@ -1,7 +1,10 @@
 build/
+build/*
 build2/
 .dart_tool/
+.dart_tool/*
 .idea/
 android/key.properties
 .DS_Store
 keys/androidfastlanekey.json
+.packages
