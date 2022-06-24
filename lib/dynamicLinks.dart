@@ -90,9 +90,10 @@ void initDynamicLinks(BuildContext context) async {
       tappedOnMood(context, collectionName);
     }
   } else {
+    //disable deep linking for macos
     final PendingDynamicLinkData data =
-        await FirebaseDynamicLinks.instance.getInitialLink();
-
+        await FirebaseDynamicLinks?.instance?.getInitialLink();
+    //final PendingDynamicLinkData data = null;
     final Uri deepLink = data?.link;
     if (deepLink != null) {
       String fullString = deepLink.toString();

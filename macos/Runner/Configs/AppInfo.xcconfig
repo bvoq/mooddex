@@ -11,4 +11,4 @@ PRODUCT_NAME = mooddex
 PRODUCT_BUNDLE_IDENTIFIER = ch.dekeyser.mooddex
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2020 ch.dekeyser. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2022 ch.dekeyser. All rights reserved.
