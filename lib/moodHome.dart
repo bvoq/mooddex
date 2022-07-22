@@ -1,212 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+//import 'package:universal_html/html.dart';
 
-import 'moodSearch.dart';
-import 'moodDetail.dart';
+import 'moodList.dart';
 import 'moodReport.dart';
 import 'moodSwipe.dart';
 import 'globalState.dart';
 import 'login.dart';
-import 'record.dart';
 import 'register.dart';
 import 'dynamicLinks.dart';
 
-import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-class MyMoods extends StatefulWidget {
-  @override
-  MyMoodsState createState() => MyMoodsState();
-}
-
-class MyMoodsState extends State<MyMoods> {
-  List<RecordUser> records;
-  List<int> sortingOrders = [1, 1, -1];
-  int currentSortedIndex;
-
-  MyMoodsState() {
-    loadMyMoods(2, true);
-    globalState.addUpdateFunction((Record record) {
-      loadMyMoods(currentSortedIndex, false);
-      return;
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    initDynamicLinks(context);
-  }
-
-  void loadMyMoods(int index, bool constructor) {
-    assert(index >= 0 && index <= 2);
-    if (currentSortedIndex == index)
-      sortingOrders[index] = -sortingOrders[index];
-
-    currentSortedIndex = index;
-    records = globalState.userRecords.entries.map((e) => e.value).toList();
-    //now sort according to selected criteria.
-    records.sort((a, b) {
-      if (index == 0) {
-        return sortingOrders[index] *
-            a.collectionName.compareTo(b.collectionName);
-      } else if (index == 1) {
-        return sortingOrders[index] * a.category.compareTo(b.category);
-      } else if (index == 2) {
-        return sortingOrders[index] * a.rating.compareTo(b.rating);
-      }
-      return 0;
-    });
-
-    if (!constructor) setState(() => {}); //call build function again.
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SliverStickyHeader(
-      overlapsContent: true,
-      header: Container(
-        color: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.98),
-        child: DataTable(
-            sortColumnIndex: currentSortedIndex,
-            sortAscending: sortingOrders[currentSortedIndex] >= 0,
-            columnSpacing: 0,
-            horizontalMargin: 24,
-            columns: [
-              DataColumn(
-                label: Container(
-                  width: (MediaQuery.of(context).size.width - 5.3 * 24) * 0.59,
-                  child: Text("Name"),
-                ),
-                onSort: (columnIndex, sortAscending) =>
-                    loadMyMoods(columnIndex, false),
-                numeric: false,
-              ),
-              DataColumn(
-                label: Container(
-                  width: (MediaQuery.of(context).size.width - 6 * 24) * 0.24,
-                  child: Text("Category"),
-                ),
-                onSort: (columnIndex, sortAscending) =>
-                    loadMyMoods(columnIndex, false),
-                numeric: false,
-              ),
-              DataColumn(
-                  label: Container(
-                    width: (MediaQuery.of(context).size.width - 6 * 24) * 0.17,
-                    child: Text("Rating"),
-                  ),
-                  onSort: (columnIndex, sortAscending) =>
-                      loadMyMoods(columnIndex, false),
-                  numeric: true),
-            ],
-            rows: [] /*
-            DataRow(
-              cells: [
-                DataCell(
-                  Container(
-                    width: MediaQuery.of(context).size.width * 0.33333,
-                    child: Text(""),
-                  ),
-                ),
-                DataCell(Text("I do this")),
-                DataCell(
-                  Text("NaN"),
-                ),
-              ],
-            ),
-          ],*/
-            ),
-      ),
-      sliver: SliverToBoxAdapter(
-        child: Container(
-          child: DataTable(
-            columnSpacing: 0,
-            horizontalMargin: 24,
-            dataRowHeight: 48,
-            columns: [
-              DataColumn(
-                label: Container(
-                  width: (MediaQuery.of(context).size.width - 4.5 * 24) * 0.59,
-                ),
-              ),
-              DataColumn(
-                label: Container(
-                  width: (MediaQuery.of(context).size.width - 4.5 * 24) * 0.24,
-                ),
-                numeric: false,
-              ),
-              DataColumn(
-                  label: Container(
-                    width:
-                        (MediaQuery.of(context).size.width - 4.5 * 24) * 0.17,
-                  ),
-                  numeric: true),
-            ],
-            rows: records
-                .map(
-                  (recordUser) => DataRow(
-                    cells: [
-                      DataCell(
-                        Container(
-                          alignment: Alignment.centerLeft,
-                          width:
-                              (MediaQuery.of(context).size.width - 4.5 * 24) *
-                                  0.59,
-                          height: 48,
-                          child: Text(recordUser.name),
-                        ),
-                        onTap: () =>
-                            tappedOnMood(context, recordUser.collectionName),
-                      ),
-                      DataCell(
-                          Container(
-                            alignment: Alignment.centerLeft,
-                            width:
-                                (MediaQuery.of(context).size.width - 4.5 * 24) *
-                                    0.24,
-                            height: 48,
-                            child: Text(recordUser.category == 0
-                                ? "I do this"
-                                : recordUser.category == 1
-                                    ? "I did this"
-                                    : recordUser.category == 2
-                                        ? "I will do this"
-                                        : ""),
-                          ),
-                          onTap: () =>
-                              tappedOnMood(context, recordUser.collectionName)),
-                      DataCell(
-                        Container(
-                            alignment: Alignment.centerRight,
-                            width:
-                                (MediaQuery.of(context).size.width - 4.5 * 24) *
-                                    0.17,
-                            height: 48,
-                            child: Text(recordUser.rating == 0
-                                ? "NaN"
-                                : recordUser.rating.toString())),
-                        placeholder: recordUser.rating == 0,
-                        onTap: () =>
-                            tappedOnMood(context, recordUser.collectionName),
-                      ),
-                    ],
-                  ),
-                )
-                .toList(),
-          ),
-        ),
-      ),
-    );
-
-    /*
-    return SliverList(
-        delegate: SliverChildBuilderDelegate((content, i) {
-      return _buildItem(context, records[i]);
-    }, childCount: records.length));
-    */
-  }
-}
 
 class MoodHome extends StatefulWidget {
   double width, height;
@@ -219,12 +23,19 @@ class MoodHome extends StatefulWidget {
 class MoodHomeState extends State<MoodHome> {
   int bottomNavigationIndex;
   MyMoods myMoods;
+  MoodTypes moodTypes;
   MoodSwipe moodSwipe;
 
   MoodHomeState(double width, double height) {
     bottomNavigationIndex = 0;
     myMoods = MyMoods();
+    moodTypes = MoodTypes();
     moodSwipe = MoodSwipe(width: width, height: height);
+  }
+  @override
+  void initState() {
+    super.initState();
+    initDynamicLinks(context);
   }
 
   @override
@@ -300,12 +111,13 @@ class MoodHomeState extends State<MoodHome> {
       ),*/
 
       body: bottomNavigationIndex == 0
-          ? CustomScrollView(
+          ? moodTypes
+          /*CustomScrollView(
               slivers: <Widget>[
                 CupertinoSliverNavigationBar(largeTitle: Text("Mood Dex")),
                 myMoods,
               ],
-            )
+            )*/
           : bottomNavigationIndex == 1
               ? moodSwipe
               : bottomNavigationIndex == 2
@@ -316,7 +128,43 @@ class MoodHomeState extends State<MoodHome> {
                           Spacer(flex: 1),
                           Padding(
                               padding: EdgeInsets.symmetric(horizontal: 48),
-                              child: Text("User: " + globalState.userName)),
+                              child: Text("Username: " + globalState.userName)),
+                          globalState.user.isAnonymous
+                              ? Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 48),
+                                  child: Text("Anonymous user. " +
+                                      globalState.user.isAnonymous.toString()))
+                              : Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 48),
+                                  child: Text("Email: " +
+                                      globalState.user.email +
+                                      (globalState.user.emailVerified
+                                          ? " (verified)"
+                                          : " (unverified)"))),
+                          Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 48),
+                              child: Text(
+                                  "UID: " + globalState.user.uid.toString())),
+                          Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 48),
+                              child: Text("Photo: " +
+                                  globalState.user.photoURL.toString())),
+                          Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 48),
+                              child: Text("Provider: " +
+                                  globalState.user.providerData.toString())),
+                          Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 48),
+                              child: Text("Phone number: " +
+                                  globalState.user.phoneNumber)),
+                          Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 48),
+                              child: Text("RefreshToken: " +
+                                  globalState.user.refreshToken.toString())),
+                          Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 48),
+                              child: Text("Metadata: " +
+                                  globalState.user.metadata.toString())),
                           Spacer(flex: 6),
                           globalState.user.isAnonymous
                               ? Center(
@@ -391,8 +239,7 @@ class MoodHomeState extends State<MoodHome> {
               icon: Icon(Icons.art_track), label: 'Mood Dex'),
           BottomNavigationBarItem(
               icon: Icon(Icons.burst_mode), label: 'Discover'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.person), label: 'Profile'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,

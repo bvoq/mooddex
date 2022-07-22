@@ -8,8 +8,8 @@ import 'package:share/share.dart';
 import "package:universal_html/html.dart" as html;
 //import 'package:universal_html/prefer_universal/html.dart' as html;
 
-import 'globalState.dart';
 import 'record.dart';
+import 'dart:io' show Platform;
 
 Future<Uri> createDynamicLink(Record record) async {
   Uri imageURI = Uri.parse(record.imageURL);
@@ -68,7 +68,9 @@ Future<void> shareMood(Record record) async {
 }
 
 void initDynamicLinks(BuildContext context) async {
+  debugPrint("hello dynamic link");
   if (kIsWeb) {
+    debugPrint("dynamic link in web");
     //debugPrint("First web mood: " + html.window.location.href);
     //CHANGE WEB
     String fullString = html.window.location.href;
@@ -89,24 +91,27 @@ void initDynamicLinks(BuildContext context) async {
       String collectionName = collectionNameWithHashtag;
       tappedOnMood(context, collectionName);
     }
-  } else {
-    //disable deep linking for macos
+  } else if (Platform.isAndroid || Platform.isIOS) {
+    debugPrint("dynamic link android and ios mood");
     final PendingDynamicLinkData data =
         await FirebaseDynamicLinks?.instance?.getInitialLink();
     //final PendingDynamicLinkData data = null;
     final Uri deepLink = data?.link;
+    debugPrint("dynamic link after deeplink");
     if (deepLink != null) {
       String fullString = deepLink.toString();
       if (fullString.startsWith("https://mood-dex.com/?")) {
         String collectionName =
             fullString.substring("https://mood-dex.com/?".length);
-        debugPrint("First mood: " + collectionName.toString());
+        tappedOnMood(context, collectionName);
+      } else if (fullString.startsWith("https://mood-dex.com/?")) {
+        String collectionName =
+            fullString.substring("https://mood-dex.com/?".length);
         tappedOnMood(context, collectionName);
       } else if (fullString.startsWith("https://dekeyser.ch/mooddex/moods/")) {
         //pre version
         String collectionName =
             fullString.substring("https://dekeyser.ch/mooddex/moods/".length);
-        debugPrint("First mood: " + collectionName.toString());
         tappedOnMood(context, collectionName);
       }
     }
@@ -118,23 +123,25 @@ void initDynamicLinks(BuildContext context) async {
       if (deepLink != null) {
         //first extract the record
         String fullString = deepLink.toString();
-        debugPrint("full second string: " + fullString);
+        debugPrint("dynamic link input string: " + fullString);
         if (fullString.startsWith("https://mood-dex.com/moods?")) {
           String collectionName =
               fullString.substring("https://mood-dex.com/moods?".length);
-          debugPrint("Second mood: " + collectionName.toString());
+          tappedOnMood(context, collectionName);
+        } else if (fullString.startsWith("https://mood-dex.com/?")) {
+          String collectionName =
+              fullString.substring("https://mood-dex.com/?".length);
           tappedOnMood(context, collectionName);
         } else if (fullString
             .startsWith("https://dekeyser.ch/mooddex/moods/")) {
           //pre version
           String collectionName =
               fullString.substring("https://dekeyser.ch/mooddex/moods/".length);
-          debugPrint("Second mood: " + collectionName.toString());
           tappedOnMood(context, collectionName);
         }
       }
     }, onError: (OnLinkErrorException e) async {
-      print('onLinkError');
+      print('dynamic link onLinkError');
       print(e.message);
     });
   }

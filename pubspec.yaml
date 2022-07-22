@@ -22,7 +22,7 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.3  
+  cupertino_icons: ^1.0.3
   firebase_core: ^1.12.0
   firebase_auth: ^3.3.6
   cloud_firestore: ^3.1.7
@@ -38,33 +38,30 @@ dependencies:
   flutter_sticky_header: ^0.6.0
   url_launcher: ^6.0.3
   universal_html: ^2.0.8
-
-  # cupertino_icons: ^0.1.2  
+  tuple: ^2.0.0
+  # cupertino_icons: ^0.1.2
   # firebase_core: 0.4.4
   # firebase_auth: ^0.15.5+3
   # cloud_firestore: 0.13.4
   # firebase_storage: ^3.1.5
   # firebase_dynamic_links: ^0.5.0+11
   # share: ^0.6.3+6
-  # image_picker: ^0.6.4  
+  # image_picker: ^0.6.4
   # path: ^1.6.4
   # path_provider: ^1.6.5
   # smooth_star_rating: 1.0.4+2
   # flutter_sticky_header: ^0.4.2
   # url_launcher: ^5.4.2
-  
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -75,7 +72,9 @@ flutter:
     - images/gondola.png
     - images/gondolaupside.png
     - images/philosopher.png
-
+    - images/anime.png
+    - images/mood.png
+    - images/all.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

@@ -3,7 +3,6 @@ import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
-import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
 
@@ -32,6 +31,7 @@ class Record {
   final String author;
   final String collectionName;
   final String link;
+  final int type;
 
   List<int> votes;
   int totalvotes;
@@ -78,6 +78,7 @@ class Record {
         assert(map['searchable'] != null),
         assert(map['author'] != null),
         assert(map['link'] != null),
+        assert(map['type'] != null),
         name = map['name'],
         added = 0,
         //votes = map['votes'].cast<int>(),
@@ -110,7 +111,8 @@ class Record {
             "_" +
             map['author'] +
             (map['searchable'] ? "_0" : "_1"),
-        link = map['link'] {
+        link = map['link'],
+        type = map['type'] {
     updateScore(votes);
   }
 
@@ -123,7 +125,8 @@ class Record {
       XFile imageFileToBeUploaded,
       bool searchable,
       String author,
-      String link})
+      String link,
+      int type})
       : assert(votes.length == 10),
         assert(name.length > 3 && name.length <= 45),
         name = name,
@@ -143,7 +146,8 @@ class Record {
             "_" +
             author +
             (searchable ? "_0" : "_1"),
-        link = link {
+        link = link,
+        type = type {
     updateScore(votes);
     imageURL = "";
   }
@@ -235,89 +239,6 @@ class Record {
     var jpg = imagelib.encodeJpg(image, quality: 80);
 
     if (jpg == null) return "";
-    /*
-    webFile.FileSystem _filesystem =
-        await webFile.window.requestFileSystem(1024 * 1024, persistent: false);
-    webFile.FileEntry fileEntry =
-        await _filesystem.root.createFile('tempimage');
-    webFile.FileWriter fw = await fileEntry.createWriter();
-    fw.write(jpg);
-    File file = await fileEntry.file();*/
-
-    //List<int> byt = await imageFileToBeUploaded.readAsBytes();
-    //debugPrint("le bytes: " + byt.toString());
-    /*
-    final reader = webFile.FileReader();
-    Blob blob = Blob(imageFileToBeUploaded.readAsBytesSync());
-    reader.readAsText(imageFileToBeUploaded.path);
-
-    await reader.onLoad.first;
-
-    String data = reader.result;
-
-    webFile.FileSystem _filesystem =
-        await webFile.window.requestFileSystem(1024 * 1024, persistent: false);
-    webFile.FileEntry fileEntry =
-        await _filesystem.root.createFile('tempimage');
-    webFile.FileWriter fw = await fileEntry.createWriter();
-    fw.write(imageFileToBeUploaded);
-    File file = await fileEntry.file();
-
-    File file = File.fromUri(Uri.parse(imageFileToBeUploaded.path));
-    debugPrint("le file");
-
-    List<int> haveSomeBytes = await file.readAsBytes();
-
-    debugPrint("le bytes: " + haveSomeBytes.toString());
-    */
-
-    /*
-    var image = imagelib.decodeImage(imageFileToBeUploaded.readAsBytesSync());
-    print("the image: " + image.toString());
-    var jpg = imagelib.encodeJpg(image, quality: 90);
-    print("the jpg: " + jpg.toString());*/
-
-    //debugPrint(
-    //    'byte format: ' + imageFileToBeUploaded.readAsBytes().toString());
-    /*
-    List<int> imgbytes8 = await imageFileToBeUploaded.readAsBytes();
-    debugPrint('done with imgbytes8');
-    debugPrint('int format: ' + imgbytes8.toString());
-    */
-
-    //int decimalValues = ByteData.view(imgbytes8.buffer).getInt16(0, Endian.little);
-    /*
-    int decimalValue = 0;
-    List<int> decimalValues;
-    for (int i = 0; i < imgbytes8.length - 4; ++i) {
-      for (int j = 0; j < 4; j++) {
-        decimalValue =
-            decimalValue << 8; // shift everything one byte to the left
-        decimalValue = decimalValue | imgbytes8[i + j]; // bitwise or operation
-      }
-      decimalValues.add(decimalValue);
-      decimalValue = 0;
-    }*/
-
-    /*
-    String mimeStr = lookupMimeType(imageFileToBeUploaded.path);
-    debugPrint('mimeStr: ' + mimeStr);
-    String contentType = 'image/jpeg';
-
-    // lookupMimeType(imageFileToBeUploaded.path);
-    if (mimeStr == null) {
-      debugPrint('null mime');
-    }
-    debugPrint('mimeStr: ' + mimeStr);
-    var fileType = mimeStr.split('/');
-    debugPrint('file type ' + fileType.toString());
-    */
-
-    /*
-    if (extension != "jpg" && extension != "jpeg" && extension != "png") {
-      debugPrint('unknown basename: ' + extension);
-      return "";
-    }*/
 
     // https://pub.dev/packages/firebase_storage/example
     firebase_storage.FirebaseStorage storage =
@@ -415,6 +336,7 @@ class Record {
               'location': "",
               'rnd': (new Random()).nextDouble(),
               'ts': FieldValue.serverTimestamp(),
+              'type': 0 // mood
             }).then((onValue) {
               debugPrint("final set data");
               uploaded = true;
@@ -425,6 +347,21 @@ class Record {
         });
       }
     }
+  }
+
+  static String categoryType(int type) {
+    if (type == 0)
+      return "Moods";
+    else if (type == 1)
+      return "Anime";
+    else if (type == 9223372036854775807)
+      return "All";
+    else
+      return "Unknown";
+  }
+
+  String getCategoryType() {
+    return Record.categoryType(type);
   }
 
   @override

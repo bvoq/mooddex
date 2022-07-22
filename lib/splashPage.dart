@@ -23,8 +23,9 @@ class _SplashPageState extends State<SplashPage> {
 
     if (currentUser != null) {
       debugPrint("not null");
-      neverSignedIn = false;
-      setState(() {});
+      setState(() {
+        neverSignedIn = false;
+      });
       globalState.setUser(currentUser).then((glsuccess) {
         debugPrint("setuserstate: " + glsuccess.toString());
         if (glsuccess) {

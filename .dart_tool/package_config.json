@@ -350,6 +350,12 @@
       "languageVersion": "2.14"
     },
     {
+      "name": "quiver",
+      "rootUri": "file:///usr/local/Caskroom/flutter/3.0.2/flutter/.pub-cache/hosted/pub.dartlang.org/quiver-3.1.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "share",
       "rootUri": "file:///usr/local/Caskroom/flutter/3.0.2/flutter/.pub-cache/hosted/pub.dartlang.org/share-2.0.4",
       "packageUri": "lib/",
@@ -400,6 +406,12 @@
     {
       "name": "test_api",
       "rootUri": "file:///usr/local/Caskroom/flutter/3.0.2/flutter/.pub-cache/hosted/pub.dartlang.org/test_api-0.4.9",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "tuple",
+      "rootUri": "file:///usr/local/Caskroom/flutter/3.0.2/flutter/.pub-cache/hosted/pub.dartlang.org/tuple-2.0.0",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
@@ -506,7 +518,7 @@
       "languageVersion": "2.2"
     }
   ],
-  "generated": "2022-06-24T15:03:30.131905Z",
+  "generated": "2022-07-22T13:27:24.178352Z",
   "generator": "pub",
   "generatorVersion": "2.17.3"
 }

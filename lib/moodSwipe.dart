@@ -212,7 +212,7 @@ class MoodSwipeState extends State<MoodSwipe> {
                   ),
                   Container(
                     width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height - 120,
+                    height: MediaQuery.of(context).size.height - 151,
                     child: Stack(
                       alignment: AlignmentDirectional.center,
                       children: displayCards,

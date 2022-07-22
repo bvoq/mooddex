@@ -63,7 +63,8 @@ class MoodAddState extends State<MoodAdd> {
           imageFileToBeUploaded: _imageFile,
           searchable: (searchable == 0),
           author: globalState.getUser().uid,
-          link: _linkController.text);
+          link: _linkController.text,
+          type: 0);
       Future<void> success = r.publish();
 
       success.then((value) {

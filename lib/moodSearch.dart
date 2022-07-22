@@ -19,43 +19,6 @@ CupertinoSearchBar MoodSearchCupertino() {
   return CupertinoSearchBar(key: UniqueKey(), TextEditingController controller, FocusNode focusNode, VoidCallback onCancel, ValueChanged<String> onChanged, ValueChanged<String> onSubmitted, bool autoFocus: false, Animation<double> animation, VoidCallback onClear, bool enabled: true, bool autoCorrect: true);
 }*/
 
-Widget _buildList(
-    BuildContext context, List<DocumentSnapshot> snapshot, String query) {
-  List<Widget> searchWidgets =
-      snapshot.map((data) => _buildListItem(context, data, query)).toList();
-  if (!kIsWeb) searchWidgets.add(_addNewMood(context, query));
-  return ListView(
-    padding: const EdgeInsets.only(top: 20.0),
-    children: searchWidgets,
-  );
-}
-
-Widget _addNewMood(BuildContext context, String query) {
-  return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(color: Theme.of(context).accentColor),
-          borderRadius: BorderRadius.circular(5.0),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-                child: ListTile(
-                    title: Text("Add mood: " + query),
-                    leading:
-                        Icon(Icons.add, color: Theme.of(context).accentColor),
-                    onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              MoodAdd(query: query, callback: () {}),
-                        )))),
-          ],
-        ),
-      ));
-}
-
 Widget _searchSuggestions(String query) {
   List<String> searchTerms = query
       .toLowerCase()
@@ -101,6 +64,17 @@ Widget _searchSuggestions(String query) {
   }
 }
 
+Widget _buildList(
+    BuildContext context, List<DocumentSnapshot> snapshot, String query) {
+  List<Widget> searchWidgets =
+      snapshot.map((data) => _buildListItem(context, data, query)).toList();
+  if (!kIsWeb) searchWidgets.add(_addNewMood(context, query));
+  return ListView(
+    padding: const EdgeInsets.only(top: 20.0),
+    children: searchWidgets,
+  );
+}
+
 Widget _buildListItem(
     BuildContext context, DocumentSnapshot data, String query) {
   //final record = Record.fromMap(data); // where Map data
@@ -116,9 +90,10 @@ Widget _buildListItem(
       child: ListTile(
           title: Text(record.name),
           trailing: Container(
-            width: 40,
+            width: 100,
             child: Row(
               children: [
+                Text(record.getCategoryType() + " "),
                 Icon(Icons.people),
                 Text(record.added.toString()),
               ],
@@ -132,6 +107,32 @@ Widget _buildListItem(
           ),
     ),
   );
+}
+
+Widget _addNewMood(BuildContext context, String query) {
+  return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Theme.of(context).accentColor),
+          borderRadius: BorderRadius.circular(5.0),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+                child: ListTile(
+                    title: Text("Add mood: " + query),
+                    leading:
+                        Icon(Icons.add, color: Theme.of(context).accentColor),
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              MoodAdd(query: query, callback: () {}),
+                        )))),
+          ],
+        ),
+      ));
 }
 
 class MoodSearchMaterial extends SearchDelegate<String> {

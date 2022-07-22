@@ -10,6 +10,7 @@ class RecordUser {
   final String name;
   final DocumentReference reference;
   final String imageURL;
+  final int type;
 
   String image;
 
@@ -19,13 +20,14 @@ class RecordUser {
   String guideText;
 
   RecordUser(String cn, String na, DocumentReference dr, String im, int ra,
-      int ca, String gu)
+      int ca, int ty, String gu)
       : collectionName = cn,
         name = na,
         rating = ra,
         reference = dr,
         imageURL = im,
         category = ca,
+        type = ty,
         guideText = gu;
 
   RecordUser.fromMap(Map<String, dynamic> map)
@@ -36,6 +38,9 @@ class RecordUser {
         assert(map["ra"] != null),
         assert(map["ca"] != null),
         assert(map["gu"] != null),
+        type = map.containsKey("ty")
+            ? map["ty"]
+            : 0, //old accounts don't have type info.
         collectionName = map["cn"],
         name = map["na"],
         reference = map["dr"],
@@ -190,6 +195,9 @@ class GlobalState {
         assert(ds.get("im") != null);
         assert(ds.get("ca") != null);
         assert(ds.get("gu") != null);
+        /*int type = ds.get("ty") != null
+            ? ds.get("ty")
+            : 0;*/ //update old users automatically
         guideText = ds.get("gu");
         previousRating = ds.get("ra");
         if (guideText.length > 0) {
@@ -224,6 +232,7 @@ class GlobalState {
           "gu": "",
           "ra": rating,
           "ca": category,
+          "ty": r.type
         });
 
         await transaction.update(r.reference, {
@@ -243,7 +252,7 @@ class GlobalState {
       r.updateScore(votes);
 
       RecordUser ru = RecordUser(r.collectionName, r.name, r.reference,
-          r.imageURL, rating, category, guideText);
+          r.imageURL, rating, category, r.type, guideText);
       userRecords[r.collectionName] = ru;
 
       for (int i = 0; i < updateTheseWidgetsOnUpdate.length; ++i) {
