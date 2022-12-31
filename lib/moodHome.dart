@@ -126,21 +126,25 @@ class MoodHomeState extends State<MoodHome> {
                         children: [
                           CupertinoNavigationBar(middle: Text("My Profile")),
                           Spacer(flex: 1),
-                          Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 48),
-                              child: Text("Username: " + globalState.userName)),
                           globalState.user.isAnonymous
-                              ? Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 48),
-                                  child: Text("Anonymous user. " +
-                                      globalState.user.isAnonymous.toString()))
-                              : Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 48),
-                                  child: Text("Email: " +
-                                      globalState.user.email +
-                                      (globalState.user.emailVerified
-                                          ? " (verified)"
-                                          : " (unverified)"))),
+                              ? Text("Anonymous user")
+                              : Column(
+                                  children: [
+                                    Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 48),
+                                        child: Text("Username: " +
+                                            globalState.userName)),
+                                    Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 48),
+                                        child: Text("Email: " +
+                                            globalState.user.email +
+                                            (globalState.user.emailVerified
+                                                ? " (verified)"
+                                                : " (unverified)"))),
+                                  ],
+                                ),
                           Padding(
                               padding: EdgeInsets.symmetric(horizontal: 48),
                               child: Text(
@@ -153,10 +157,11 @@ class MoodHomeState extends State<MoodHome> {
                               padding: EdgeInsets.symmetric(horizontal: 48),
                               child: Text("Provider: " +
                                   globalState.user.providerData.toString())),
-                          Padding(
+                          /*Padding(
                               padding: EdgeInsets.symmetric(horizontal: 48),
                               child: Text("Phone number: " +
-                                  globalState.user.phoneNumber)),
+                                      globalState.user.phoneNumber ??
+                                  "None")),*/
                           Padding(
                               padding: EdgeInsets.symmetric(horizontal: 48),
                               child: Text("RefreshToken: " +
@@ -172,7 +177,7 @@ class MoodHomeState extends State<MoodHome> {
                                     style: ElevatedButton.styleFrom(
                                         backgroundColor:
                                             Theme.of(context).primaryColor,
-                                        fixedSize: Size.fromWidth(100),
+                                        fixedSize: Size.fromWidth(300),
                                         padding: EdgeInsets.all(10),
                                         textStyle:
                                             TextStyle(color: Colors.white)),
@@ -194,7 +199,7 @@ class MoodHomeState extends State<MoodHome> {
                                 style: ElevatedButton.styleFrom(
                                     backgroundColor:
                                         Theme.of(context).primaryColor,
-                                    fixedSize: Size.fromWidth(100),
+                                    fixedSize: Size.fromWidth(300),
                                     padding: EdgeInsets.all(10),
                                     textStyle: TextStyle(color: Colors.white)),
                                 child: Text("Login with a different account"),

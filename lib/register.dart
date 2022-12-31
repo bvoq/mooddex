@@ -232,12 +232,13 @@ class _RegisterPageState extends State<RegisterPage> {
                     },
                   ),
                   Text("Already have an account?"),
-                  TextButton(
-                    style: TextButton.styleFrom(
-                      backgroundColor: Colors.grey,
-                      padding: EdgeInsets.all(0),
-                    ),
-                    child: Text("Login here!"),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).primaryColorDark,
+                        fixedSize: Size.fromWidth(100),
+                        padding: EdgeInsets.all(10),
+                        textStyle: TextStyle(color: Colors.white)),
+                    child: Text("Login here"),
                     onPressed: () {
                       Navigator.pushReplacement(
                         context,

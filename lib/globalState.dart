@@ -7,6 +7,27 @@ import 'package:flutter/material.dart';
 import 'guide.dart';
 import 'record.dart';
 
+Map<int, Map<int, String>> typeCategoryToName = {
+  0: {
+    0: "I do this",
+    1: "I did this",
+    2: "I will do this",
+    3: "I stopped this",
+  },
+  1: {
+    0: "I watch this",
+    1: "I watched this",
+    2: "I plan to watch this",
+    3: "I stopped watching this",
+  },
+  9223372036854775807: {
+    0: "I do this",
+    1: "I did this",
+    2: "I will do this",
+    3: "I stopped this",
+  }
+};
+
 class RecordUser {
   final String collectionName;
   final String name;
@@ -196,7 +217,7 @@ class GlobalState {
         assert(ds.get("gu") != null);
         /*int type = ds.get("ty") != null
             ? ds.get("ty")
-            : 0;*/ //update old users automatically
+            : 0; //update moods automatically*/
         guideText = ds.get("gu");
         previousRating = ds.get("ra");
         if (guideText.length > 0) {

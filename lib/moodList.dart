@@ -208,7 +208,7 @@ class MyMoodsState extends State<MyMoods> {
                   DataColumn(
                     label: Container(
                       width:
-                          (MediaQuery.of(context).size.width - 6 * 24) * 0.24,
+                          (MediaQuery.of(context).size.width - 6 * 24) * 0.27,
                       child: Text("Category"),
                     ),
                     onSort: (columnIndex, sortAscending) =>
@@ -218,7 +218,7 @@ class MyMoodsState extends State<MyMoods> {
                   DataColumn(
                       label: Container(
                         width:
-                            (MediaQuery.of(context).size.width - 6 * 24) * 0.17,
+                            (MediaQuery.of(context).size.width - 6 * 24) * 0.20,
                         child: Text("Rating"),
                       ),
                       onSort: (columnIndex, sortAscending) =>
@@ -293,13 +293,11 @@ class MyMoodsState extends State<MyMoods> {
                                         4.5 * 24) *
                                     0.24,
                                 height: 48,
-                                child: Text(recordUser.category == 0
-                                    ? "I do this"
-                                    : recordUser.category == 1
-                                        ? "I did this"
-                                        : recordUser.category == 2
-                                            ? "I will do this"
-                                            : ""),
+                                child: Text(
+                                  typeCategoryToName[recordUser.type]
+                                          [recordUser.category] ??
+                                      "",
+                                ),
                               ),
                               onTap: () => tappedOnMood(
                                   context, recordUser.collectionName)),

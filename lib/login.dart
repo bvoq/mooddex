@@ -193,10 +193,14 @@ class _LoginPageState extends State<LoginPage> {
                     },
                   ),
                   Text("Don't have an account yet?"),
-                  TextButton(
-                    style: TextButton.styleFrom(
-                      backgroundColor: Colors.grey,
-                      padding: EdgeInsets.all(0),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).primaryColorDark,
+                      textStyle: TextStyle(
+                        color: Colors.white,
+                      ),
+                      fixedSize: Size.fromWidth(200),
+                      padding: EdgeInsets.all(10),
                     ),
                     child: Text("Create a new account"),
                     onPressed: () {

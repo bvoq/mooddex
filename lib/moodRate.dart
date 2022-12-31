@@ -10,23 +10,26 @@ class MoodRate extends StatefulWidget {
   MoodRate({Key key, @required this.record}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => MoodRateState(record.collectionName);
+  State<StatefulWidget> createState() =>
+      MoodRateState(record.collectionName, record.type);
 }
 
 class MoodRateState extends State<MoodRate> {
   double _ratingForStars;
   int rating;
   int category;
-  MoodRateState(String collectionName)
+  int type;
+  MoodRateState(String collectionName, int type)
       : _ratingForStars = 0,
         rating = 0,
-        category = 0 {
+        category = 0,
+        this.type = type {
     assert(globalState.userRecords != null);
-
     if (globalState.userRecords.containsKey(collectionName)) {
       rating = globalState.userRecords[collectionName].rating;
       _ratingForStars = rating.toDouble();
       category = globalState.userRecords[collectionName].category;
+      type = globalState.userRecords[collectionName].type ?? 0;
     }
   }
 
@@ -93,18 +96,19 @@ class MoodRateState extends State<MoodRate> {
             ),
             CupertinoSlidingSegmentedControl(
                 groupValue: category,
-                children: const <int, Widget>{
+                children: <int, Widget>{
                   0: Padding(
                       padding: const EdgeInsets.only(left: 6, right: 6),
-                      child: Text("I do this", style: TextStyle(fontSize: 12))),
+                      child: Text(typeCategoryToName[type][0],
+                          style: TextStyle(fontSize: 12))),
                   1: Padding(
                       padding: const EdgeInsets.only(left: 6, right: 6),
-                      child:
-                          Text("I did this", style: TextStyle(fontSize: 12))),
+                      child: Text(typeCategoryToName[type][1],
+                          style: TextStyle(fontSize: 12))),
                   2: Padding(
                       padding: const EdgeInsets.only(left: 6, right: 6),
-                      child: Text("I will do this",
-                          style: TextStyle(fontSize: 11))),
+                      child: Text(typeCategoryToName[type][2],
+                          style: TextStyle(fontSize: 12))),
                 },
                 onValueChanged: (i) {
                   setState(() {
