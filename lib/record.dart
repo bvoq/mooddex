@@ -18,6 +18,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'globalState.dart';
 import 'stopwords.dart';
 
+/*
+enum MoodType {
+  moods(0,"Moods"),
+  anime(1,"Anime"),
+  all(9223372036854775807,"All");
+  final int value;
+  final String name;
+  const MoodType(this.value, this.name);
+};*/
+
 class IDPair {
   int a;
   double b;

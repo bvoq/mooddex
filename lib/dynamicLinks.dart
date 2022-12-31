@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:mooddex_client/moodDetail.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
-import 'package:share/share.dart';
+import 'package:share_plus/share_plus.dart';
 import "package:universal_html/html.dart" as html;
 //import 'package:universal_html/prefer_universal/html.dart' as html;
 
@@ -21,7 +21,7 @@ Future<Uri> createDynamicLink(Record record) async {
       packageName: 'ch.dekeyser.mooddex_client',
       minimumVersion: 0,
     ),
-    iosParameters: IosParameters(
+    iosParameters: IOSParameters(
       bundleId: 'ch.dekeyser.mooddexClient',
       minimumVersion: '1.0.0',
       appStoreId: '1508217727', //should be changed later.
@@ -51,12 +51,14 @@ Future<Uri> createDynamicLink(Record record) async {
     ),
   );
 
-  final ShortDynamicLink shortDynamicLink = await parameters.buildShortLink();
-  final Uri longUrl = await parameters.buildUrl();
-  debugPrint("longUrl: " + longUrl.toString());
-  final Uri shortUrl = shortDynamicLink.shortUrl;
+  final ShortDynamicLink shortDynamicLink =
+      await FirebaseDynamicLinks.instance.buildShortLink(parameters);
+  final Uri longUrl = await FirebaseDynamicLinks.instance.buildLink(parameters);
+  ;
 
-  // String guideLink;
+  final Uri shortUrl = shortDynamicLink.shortUrl;
+  debugPrint("shortUrl: " + shortUrl.toString());
+  debugPrint("longUrl: " + longUrl.toString());
 
   return shortUrl;
 }
@@ -94,11 +96,12 @@ void initDynamicLinks(BuildContext context) async {
   } else if (Platform.isAndroid || Platform.isIOS) {
     debugPrint("dynamic link android and ios mood");
     final PendingDynamicLinkData data =
-        await FirebaseDynamicLinks?.instance?.getInitialLink();
-    //final PendingDynamicLinkData data = null;
-    final Uri deepLink = data?.link;
-    debugPrint("dynamic link after deeplink");
-    if (deepLink != null) {
+        await FirebaseDynamicLinks.instance.getInitialLink();
+
+    if (data != null) {
+      //final PendingDynamicLinkData data = null;
+      final Uri deepLink = data.link;
+      debugPrint("dynamic link after deeplink");
       String fullString = deepLink.toString();
       if (fullString.startsWith("https://mood-dex.com/?")) {
         String collectionName =
@@ -116,9 +119,9 @@ void initDynamicLinks(BuildContext context) async {
       }
     }
 
-    FirebaseDynamicLinks.instance.onLink(
-        onSuccess: (PendingDynamicLinkData dynamicLink) async {
-      final Uri deepLink = dynamicLink?.link;
+    FirebaseDynamicLinks.instance.onLink.listen(
+        (PendingDynamicLinkData dynamicLink) async {
+      final Uri deepLink = dynamicLink.link;
 
       if (deepLink != null) {
         //first extract the record
@@ -140,9 +143,8 @@ void initDynamicLinks(BuildContext context) async {
           tappedOnMood(context, collectionName);
         }
       }
-    }, onError: (OnLinkErrorException e) async {
-      print('dynamic link onLinkError');
-      print(e.message);
+    }, onError: (Object o, StackTrace st) async {
+      print('dynamic link onLinkError ' + o.toString());
     });
   }
 }

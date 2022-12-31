@@ -108,10 +108,13 @@ class _RegisterPageState extends State<RegisterPage> {
                     obscureText: true,
                     validator: pwdValidator,
                   ),
-                  RaisedButton(
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).primaryColor,
+                        fixedSize: Size.fromWidth(100),
+                        padding: EdgeInsets.all(10),
+                        textStyle: TextStyle(color: Colors.white)),
                     child: Text("Register"),
-                    color: Theme.of(context).primaryColor,
-                    textColor: Colors.white,
                     onPressed: () {
                       debugPrint("try registering");
                       if (_registerFormKey.currentState.validate()) {
@@ -229,7 +232,11 @@ class _RegisterPageState extends State<RegisterPage> {
                     },
                   ),
                   Text("Already have an account?"),
-                  FlatButton(
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.grey,
+                      padding: EdgeInsets.all(0),
+                    ),
                     child: Text("Login here!"),
                     onPressed: () {
                       Navigator.pushReplacement(

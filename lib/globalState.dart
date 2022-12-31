@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -13,10 +15,8 @@ class RecordUser {
   final int type;
 
   String image;
-
   int category;
   int rating;
-  bool hasGuide;
   String guideText;
 
   RecordUser(String cn, String na, DocumentReference dr, String im, int ra,
@@ -104,7 +104,6 @@ class GlobalState {
     DocumentSnapshot ds = await userReference.get().catchError((onError) {
       if (onError.code == "Error 7") FirebaseAuth.instance.signOut();
       debugPrint("error code: " + onError.code);
-      return false;
     });
     if (!ds.exists) {
       FirebaseAuth.instance.signOut();

@@ -74,10 +74,16 @@ class _LoginPageState extends State<LoginPage> {
                     obscureText: true,
                     validator: pwdValidator,
                   ),
-                  RaisedButton(
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).primaryColor,
+                      textStyle: TextStyle(
+                        color: Colors.white,
+                      ),
+                      fixedSize: Size.fromWidth(100),
+                      padding: EdgeInsets.all(10),
+                    ),
                     child: Text("Login"),
-                    color: Theme.of(context).primaryColor,
-                    textColor: Colors.white,
                     onPressed: () async {
                       if (_loginFormKey.currentState.validate()) {
                         try {
@@ -187,7 +193,11 @@ class _LoginPageState extends State<LoginPage> {
                     },
                   ),
                   Text("Don't have an account yet?"),
-                  FlatButton(
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.grey,
+                      padding: EdgeInsets.all(0),
+                    ),
                     child: Text("Create a new account"),
                     onPressed: () {
                       Navigator.pushReplacement(

@@ -168,11 +168,16 @@ class MoodHomeState extends State<MoodHome> {
                           Spacer(flex: 6),
                           globalState.user.isAnonymous
                               ? Center(
-                                  child: RaisedButton(
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            Theme.of(context).primaryColor,
+                                        fixedSize: Size.fromWidth(100),
+                                        padding: EdgeInsets.all(10),
+                                        textStyle:
+                                            TextStyle(color: Colors.white)),
                                     child: Text(
                                         "Register and link anonymous account"),
-                                    color: Theme.of(context).primaryColor,
-                                    textColor: Colors.white,
                                     onPressed: () {
                                       Navigator.push(
                                           context,
@@ -185,10 +190,14 @@ class MoodHomeState extends State<MoodHome> {
                                 )
                               : Spacer(flex: 1),
                           Center(
-                            child: RaisedButton(
+                            child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor:
+                                        Theme.of(context).primaryColor,
+                                    fixedSize: Size.fromWidth(100),
+                                    padding: EdgeInsets.all(10),
+                                    textStyle: TextStyle(color: Colors.white)),
                                 child: Text("Login with a different account"),
-                                color: Theme.of(context).primaryColor,
-                                textColor: Colors.white,
                                 onPressed: () {
                                   Navigator.push(
                                       context,
